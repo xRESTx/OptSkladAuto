@@ -2,6 +2,7 @@ package com.warehouse.dao;
 
 import com.warehouse.models.Employee;
 import com.warehouse.utils.HibernateUtil;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class EmployeeDAO {
 
-    public void save(Employee employee) {
+    public static void save(Employee employee) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -81,5 +82,18 @@ public class EmployeeDAO {
         }
 
         return employee;
+    }
+
+    public static List<Employee> filterEmployees(String searchTerm) {
+        List<Employee> employees = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM Employee WHERE firstName LIKE :search OR lastName LIKE :search OR department.id LIKE :search";
+            Query<Employee> query = session.createQuery(hql, Employee.class);
+            query.setParameter("search", "%" + searchTerm + "%");
+            employees = query.list();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return employees;
     }
 }

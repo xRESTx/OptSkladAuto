@@ -23,7 +23,7 @@ public class DepartmentDAO {
         }
     }
 
-    public Department findById(int departmentId) {
+    public static Department findById(int departmentId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Department.class, departmentId);
         }

@@ -32,7 +32,7 @@ public class LoginPage {
         passwordField = new JPasswordField();
 
         JButton loginButton = new JButton("Войти");
-        JButton cancelButton = new JButton("Отмена");
+        JButton cancelButton = new JButton("Очистить");
 
         panel.add(loginLabel);
         panel.add(loginField);
@@ -52,10 +52,12 @@ public class LoginPage {
 
                 if (checkEmployeeCredentials(login, password)) {
                     // Если пользователь - сотрудник (Employee), открываем весь функционал
-                    new MainPage(); // Главная страница для сотрудников
+                    new MainPage();
+                    frame.dispose();// Главная страница для сотрудников
                 } else if (checkAccountCredentials(login, password)) {
                     // Если пользователь - клиент (Account), открываем ограниченный функционал
-                    new LimitedFunctionalityPage(); // Страница с ограниченным функционалом
+                    new LimitedFunctionalityPage();
+                    frame.dispose();// Страница с ограниченным функционалом
                 } else {
                     // Неверный логин/пароль
                     JOptionPane.showMessageDialog(frame, "Неверный логин или пароль!", "Ошибка", JOptionPane.ERROR_MESSAGE);
