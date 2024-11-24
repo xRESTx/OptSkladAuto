@@ -13,7 +13,7 @@ public class OrderComponent {
 
     @ManyToOne
     @JoinColumn(name = "number_order", nullable = false)
-    private Orders orders;
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "articul", nullable = false)
@@ -35,12 +35,12 @@ public class OrderComponent {
         this.id = id;
     }
 
-    public Orders getOrders() {
-        return orders;
+    public Order getOrders() {
+        return order;
     }
 
-    public void setOrders(Orders orders) {
-        this.orders = orders;
+    public void setOrders(Order orders) {
+        this.order = orders;
     }
 
     public Autotovar getAutotovar() {

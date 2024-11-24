@@ -12,9 +12,9 @@ public class Payment {
     @Column(name = "payment_id")
     private int paymentId;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "orders_id", nullable = false)
-    private Orders orders;
+    private Order order;
 
     @Column(name = "date_payment")
     @Temporal(TemporalType.DATE)
@@ -33,12 +33,12 @@ public class Payment {
         this.paymentId = paymentId;
     }
 
-    public Orders getOrders() {
-        return orders;
+    public Order getOrders() {
+        return order;
     }
 
-    public void setOrders(Orders orders) {
-        this.orders = orders;
+    public void setOrders(Order order) {
+        this.order = order;
     }
 
     public Date getDatePayment() {

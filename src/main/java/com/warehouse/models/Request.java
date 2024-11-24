@@ -22,7 +22,7 @@ public class Request {
 
     @ManyToOne
     @JoinColumn(name = "number_order")
-    private Orders orders;
+    private Order orders;
 
     @Column(name = "status_order")
     private String statusOrder;
@@ -60,11 +60,11 @@ public class Request {
         this.dateRequest = dateRequest;
     }
 
-    public Orders getOrders() {
+    public Order getOrders() {
         return orders;
     }
 
-    public void setOrders(Orders orders) {
+    public void setOrders(Order orders) {
         this.orders = orders;
     }
 

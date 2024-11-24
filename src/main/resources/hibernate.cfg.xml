@@ -47,7 +47,7 @@
         <mapping class="com.warehouse.models.Wheels"/>
         <mapping class="com.warehouse.models.Repair"/>
         <mapping class="com.warehouse.models.Accessories"/>
-        <mapping class="com.warehouse.models.Orders"/>
+        <mapping class="com.warehouse.models.Order"/>
         <mapping class="com.warehouse.models.OrderComponent"/>
         <mapping class="com.warehouse.models.Payment"/>
         <mapping class="com.warehouse.models.Request"/>

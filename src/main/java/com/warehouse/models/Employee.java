@@ -1,12 +1,14 @@
 package com.warehouse.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class Employee implements Serializable {
+    private static final long serialVersionUID = 1L; // Опционально, но рекомендуется
 
     @Id
     @Column(name = "passport_data")
@@ -40,7 +42,7 @@ public class Employee {
     private Department department;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Orders> orders;
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Request> requests;
@@ -119,11 +121,11 @@ public class Employee {
         this.department = department;
     }
 
-    public List<Orders> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Orders> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 

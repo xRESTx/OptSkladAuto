@@ -27,7 +27,7 @@ public class MainPage {
         panel.add(Box.createVerticalStrut(20)); // Отступ
 
         // Кнопки перехода на страницы
-        JButton ordersButton = new JButton("Просмотр заказов");
+        JButton ordersButton = new JButton("Управление заказами");
         JButton productsButton = new JButton("Просмотр товаров");
         JButton employeesButton = new JButton("Управление сотрудниками");
         JButton paymentsButton = new JButton("Управление платежами");
@@ -60,7 +60,7 @@ public class MainPage {
 
     private void openOrdersPage(JFrame parentFrame) {
         parentFrame.dispose(); // Закрываем главное окно
-        new OrdersPage(); // Открываем страницу заказов
+        new OrdersPage().setVisible(true); // Открываем страницу заказов
     }
 
     private void openProductsPage(JFrame parentFrame) {

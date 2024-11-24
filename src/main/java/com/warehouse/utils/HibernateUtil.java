@@ -21,7 +21,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(Electronics.class)
                     .addAnnotatedClass(Lubricants.class)
                     .addAnnotatedClass(OrderComponent.class)
-                    .addAnnotatedClass(Orders.class)
+                    .addAnnotatedClass(Order.class)
                     .addAnnotatedClass(Payment.class)
                     .addAnnotatedClass(Repair.class)
                     .addAnnotatedClass(Request.class)

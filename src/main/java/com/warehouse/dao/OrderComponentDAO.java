@@ -4,10 +4,25 @@ import com.warehouse.models.OrderComponent;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
 public class OrderComponentDAO {
+    public static List<OrderComponent> findComponentsByOrderNumber(String orderNumber) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            String hql = "FROM OrderComponent oc WHERE oc.order.numberOrder = :numberOrder";
+            Query<OrderComponent> query = session.createQuery(hql, OrderComponent.class);
+            query.setParameter("numberOrder", orderNumber);
+            return query.list(); // Возвращаем список всех компонентов заказа
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            session.close();
+        }
+    }
 
     public void save(OrderComponent orderComponent) {
         Transaction transaction = null;

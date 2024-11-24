@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
-public class Orders {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,12 @@ public class Orders {
     private Account account;
 
     @ManyToOne
-    @JoinColumn(name = "login_employee")
+    @JoinColumn(name = "login_employee", referencedColumnName = "employee_login")
     private Employee employee;
 
-    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderComponent> orderComponents;
+
 
     // Getters and Setters
 

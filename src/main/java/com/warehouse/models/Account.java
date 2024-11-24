@@ -24,7 +24,7 @@ public class Account {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<Orders> orders;
+    private List<Order> orders;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private List<Request> requests;
@@ -71,11 +71,11 @@ public class Account {
         this.phoneNumber = phoneNumber;
     }
 
-    public List<Orders> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Orders> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 
