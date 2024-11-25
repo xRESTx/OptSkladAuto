@@ -28,7 +28,7 @@ public class MainPage {
 
         // Кнопки перехода на страницы
         JButton ordersButton = new JButton("Управление заказами");
-        JButton productsButton = new JButton("Просмотр товаров");
+        JButton productsButton = new JButton("Управление товарами");
         JButton employeesButton = new JButton("Управление сотрудниками");
         JButton paymentsButton = new JButton("Управление платежами");
 
@@ -75,6 +75,6 @@ public class MainPage {
 
     private void openPaymentsPage(JFrame parentFrame) {
         parentFrame.dispose();
-        new PaymentsPage(); // Открываем страницу платежей
+        new PaymentsPage().setVisible(true); // Открываем страницу платежей
     }
 }
