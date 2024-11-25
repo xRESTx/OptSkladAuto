@@ -62,4 +62,16 @@ public class ContractDAO {
             e.printStackTrace();
         }
     }
+
+    public static void saveOrUpdate(Contract contract) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.saveOrUpdate(contract);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
+    }
 }

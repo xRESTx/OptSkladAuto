@@ -1,6 +1,6 @@
 package com.warehouse.dao;
 
-import com.warehouse.models.Employee;
+import com.warehouse.models.*;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -21,18 +21,6 @@ public class EmployeeDAO {
                 transaction.rollback();
             }
             e.printStackTrace();
-        }
-    }
-
-    public Employee findById(int passportData) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Employee.class, passportData);
-        }
-    }
-
-    public List<Employee> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Employee", Employee.class).list();
         }
     }
 
@@ -84,16 +72,85 @@ public class EmployeeDAO {
         return employee;
     }
 
-    public static List<Employee> filterEmployees(String searchTerm) {
-        List<Employee> employees = null;
+    public static List<Contract> loadContracts() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM Employee WHERE firstName LIKE :search OR lastName LIKE :search OR department.id LIKE :search";
-            Query<Employee> query = session.createQuery(hql, Employee.class);
-            query.setParameter("search", "%" + searchTerm + "%");
-            employees = query.list();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            return session.createQuery("FROM Contract", Contract.class).getResultList();
         }
-        return employees;
     }
+
+    public static List<Department> loadDepartments() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // HQL запрос для получения всех департаментов
+            return session.createQuery("FROM Department", Department.class).list();
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading departments: " + e.getMessage(), e);
+        }
+    }
+
+    public static void saveOrUpdate(Employee employee) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            session.saveOrUpdate(employee);
+            session.getTransaction().commit();
+        }
+    }
+
+    public static List<Employee> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Employee", Employee.class).getResultList();
+        }
+    }
+
+    public static Employee findById(int passportData) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Employee.class, passportData);
+        }
+    }
+
+    public static void deleteEmployee(int passportData) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            Employee emp = session.get(Employee.class, passportData);
+            if (emp != null) {
+                session.delete(emp);
+            }
+            session.getTransaction().commit();
+        }
+    }
+
+    public static List<Employee> filterEmployees(String searchTerm) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "FROM Employee e WHERE " +
+                    "CAST(e.passportData AS string) LIKE :searchTerm OR " +
+                    "e.employeeLogin LIKE :searchTerm OR " +
+                    "e.lastName LIKE :searchTerm OR " +
+                    "e.firstName LIKE :searchTerm OR " +
+                    "e.middleName LIKE :searchTerm OR " +
+                    "CAST(e.birthday AS string) LIKE :searchTerm";
+            Query<Employee> query = session.createQuery(hql, Employee.class);
+            query.setParameter("searchTerm", "%" + searchTerm + "%");
+            return query.getResultList();
+        }
+    }
+    public static void addEmployeeWithContract(Employee employee, Contract contract) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            // Сохраняем контракт
+            session.saveOrUpdate(contract);
+            employee.setContract(contract);
+
+            // Сохраняем сотрудника
+            session.saveOrUpdate(employee);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Error adding employee with contract: " + e.getMessage(), e);
+        }
+    }
+
 }

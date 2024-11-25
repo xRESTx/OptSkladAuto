@@ -1,19 +1,22 @@
 package com.warehouse.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "contract")
-public class Contract {
+public class Contract implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // для serial4
     @Column(name = "contract_number")
     private int contractNumber;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
@@ -21,16 +24,11 @@ public class Contract {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @Column(name = "position")
+    @Column(name = "position", length = 255)
     private String position;
 
     @Column(name = "salary", precision = 10, scale = 2)
-    private double salary;
-
-    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
-    private List<Employee> employees;
-
-    // Getters and Setters
+    private Double salary;
 
     public int getContractNumber() {
         return contractNumber;
@@ -64,19 +62,11 @@ public class Contract {
         this.position = position;
     }
 
-    public double getSalary() {
+    public Double getSalary() {
         return salary;
     }
 
-    public void setSalary(double salary) {
+    public void setSalary(Double salary) {
         this.salary = salary;
-    }
-
-    public List<Employee> getEmployees() {
-        return employees;
-    }
-
-    public void setEmployees(List<Employee> employees) {
-        this.employees = employees;
     }
 }
