@@ -9,7 +9,6 @@ import java.util.List;
 import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.models.Employee;
 import com.warehouse.ui.dialog.AddEmployeeDialog;
-import com.warehouse.ui.dialog.EditContractDialog;
 import com.warehouse.ui.dialog.EditEmployeeDialog;
 
 public class EmployeesPage extends JFrame {
@@ -35,7 +34,7 @@ public class EmployeesPage extends JFrame {
         // Кнопка "Назад"
         backButton.addActionListener(e -> {
             dispose(); // Закрываем текущее окно
-            new MainPage(); // Возвращаемся на главную страницу
+            new AdminMainPage(); // Возвращаемся на главную страницу
         });
 
         toolbar.add(backButton);

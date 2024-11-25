@@ -3,7 +3,7 @@ package com.warehouse.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "order_component")
+@Table(name = "orderComponent")
 public class OrderComponent {
 
     @Id

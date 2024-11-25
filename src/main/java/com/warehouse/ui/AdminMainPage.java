@@ -2,12 +2,10 @@ package com.warehouse.ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MainPage {
+public class AdminMainPage {
 
-    public MainPage() {
+    public AdminMainPage() {
         // Создаем главное окно
         JFrame frame = new JFrame("Главная страница");
         frame.setSize(1200, 800);

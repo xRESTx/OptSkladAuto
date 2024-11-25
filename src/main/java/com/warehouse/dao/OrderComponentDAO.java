@@ -77,4 +77,17 @@ public class OrderComponentDAO {
             e.printStackTrace();
         }
     }
+
+    public static void addOrderComponent(OrderComponent orderComponent) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+
+            // Сохраняем компонент заказа в базу данных
+            session.save(orderComponent);
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

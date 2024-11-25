@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 import com.warehouse.dao.OrderDAO;
@@ -33,7 +32,7 @@ public class OrdersPage extends JFrame {
         // Кнопка "Назад"
         backButton.addActionListener(e -> {
             dispose(); // Закрываем текущее окно
-            new MainPage(); // Возвращаемся на главную страницу
+            new AdminMainPage(); // Возвращаемся на главную страницу
         });
 
         // Добавляем кнопки на панель инструментов

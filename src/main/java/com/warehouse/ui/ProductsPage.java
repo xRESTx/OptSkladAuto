@@ -47,7 +47,7 @@ public class ProductsPage extends JFrame {
         // Кнопка "Назад"
         backButton.addActionListener(e -> {
             dispose(); // Закрываем текущее окно
-            new MainPage(); // Возвращаемся на главную страницу
+            new AdminMainPage(); // Возвращаемся на главную страницу
         });
 
         toolbar.add(backButton);

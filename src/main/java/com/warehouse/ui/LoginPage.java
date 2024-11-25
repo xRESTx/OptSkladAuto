@@ -14,6 +14,7 @@ public class LoginPage {
     private JFrame frame;
     private JTextField loginField;
     private JPasswordField passwordField;
+    private boolean visible;
 
     public LoginPage() {
         frame = new JFrame("Вход в систему");
@@ -52,11 +53,11 @@ public class LoginPage {
 
                 if (checkEmployeeCredentials(login, password)) {
                     // Если пользователь - сотрудник (Employee), открываем весь функционал
-                    new MainPage();
+                    new AdminMainPage();
                     frame.dispose();// Главная страница для сотрудников
                 } else if (checkAccountCredentials(login, password)) {
                     // Если пользователь - клиент (Account), открываем ограниченный функционал
-                    new LimitedFunctionalityPage();
+                    new UserMainPage().setVisible(true);
                     frame.dispose();// Страница с ограниченным функционалом
                 } else {
                     // Неверный логин/пароль
@@ -99,5 +100,13 @@ public class LoginPage {
             return true;
         }
         return false;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

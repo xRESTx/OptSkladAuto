@@ -5,9 +5,17 @@ import com.warehouse.models.Order;
 import com.warehouse.models.Employee;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import com.warehouse.models.Order;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 
 public class OrderDAO {
     // Получение заказа по номеру
@@ -133,5 +141,42 @@ public class OrderDAO {
             throw new RuntimeException("Error while sorting orders by " + column, e);
         }
     }
+    public static List<Order> findOrdersByUserLogin(String userLogin) {
+        // Получаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Создаем HQL запрос для поиска заказов по логину пользователя
+            String hql = "FROM Order o WHERE o.account.login = :userLogin"; // :userLogin - параметр запроса
 
+            // Выполняем запрос
+            Query<Order> query = session.createQuery(hql, Order.class);
+            query.setParameter("userLogin", userLogin); // Устанавливаем значение для параметра
+
+            // Получаем список заказов
+            List<Order> orders = query.getResultList();
+            return orders;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Возвращаем null в случае ошибки
+        }
+    }
+    public static int createOrder(Order order) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+        int orderId = 0;
+
+        try {
+            transaction = session.beginTransaction();
+            orderId = (Integer) session.save(order); // Сохраняем заказ и получаем его ID
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return orderId; // Возвращаем ID нового заказа
+    }
 }
