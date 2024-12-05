@@ -1,27 +1,31 @@
 package com.warehouse;
 
-import com.warehouse.entity.Product;
-import com.warehouse.service.ProductService;
+import com.warehouse.entities.Account;
+import com.warehouse.dao.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.List;
+import com.toedter.calendar.JDateChooser;
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class WarehouseApp {
 
-    private ProductService productService;
+    private AccountDAO accountDAO;
 
     // Main window components
     private JFrame frame;
-    private JTable productTable;
+    private JTable accountTable;
     private DefaultTableModel tableModel;
 
     public WarehouseApp() {
-        productService = new ProductService();
-        frame = new JFrame("Wholesale Auto Parts Warehouse");
+        accountDAO = new AccountDAO();
+        frame = new JFrame("Account Management");
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -35,10 +39,10 @@ public class WarehouseApp {
         panel.setLayout(new FlowLayout());
 
         // Buttons
-        JButton btnAdd = new JButton("Add Product");
-        JButton btnUpdate = new JButton("Update Product");
-        JButton btnDelete = new JButton("Delete Product");
-        JButton btnViewAll = new JButton("View All Products");
+        JButton btnAdd = new JButton("Add Account");
+        JButton btnUpdate = new JButton("Update Account");
+        JButton btnDelete = new JButton("Delete Account");
+        JButton btnViewAll = new JButton("View All Accounts");
 
         // Add buttons to the panel
         panel.add(btnAdd);
@@ -49,148 +53,122 @@ public class WarehouseApp {
         // Add panel to the window
         frame.getContentPane().add(panel, BorderLayout.NORTH);
 
-        // Table to display products
+        // Table to display accounts
         tableModel = new DefaultTableModel();
-        tableModel.setColumnIdentifiers(new Object[]{"SKU", "Name", "Price", "Category", "Description", "Stock"});
-        productTable = new JTable(tableModel);
+        tableModel.setColumnIdentifiers(new Object[]{"ID", "Username", "Password", "Role", "Creation Date"});
+        accountTable = new JTable(tableModel);
 
-        JScrollPane scrollPane = new JScrollPane(productTable);
+        JScrollPane scrollPane = new JScrollPane(accountTable);
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
         // Button listeners
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addProduct();
-            }
-        });
-
-        btnUpdate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateProduct();
-            }
-        });
-
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteProduct();
-            }
-        });
-
-        btnViewAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadAllProducts();
-            }
-        });
+        btnAdd.addActionListener(e -> addAccount());
+        btnUpdate.addActionListener(e -> updateAccount());
+        btnDelete.addActionListener(e -> deleteAccount());
+        btnViewAll.addActionListener(e -> loadAllAccounts());
 
         frame.setVisible(true);
     }
 
-    // Method to load all products into the table
-    private void loadAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    // Method to load all accounts into the table
+    private void loadAllAccounts() {
+        List<Account> accounts = accountDAO.findAll();
         tableModel.setRowCount(0); // Clear the table before loading new data
 
-        for (Product product : products) {
-            tableModel.addRow(new Object[]{product.getArticul(), product.getName(), product.getPrice(),
-                    product.getCategory(), product.getDescription(), product.getNalichie()});
+        for (Account account : accounts) {
+            tableModel.addRow(new Object[]{account.getId(), account.getUsername(), account.getPassword(),
+                    account.getRole(), account.getCreationDate()});
         }
     }
 
-    // Method to add a new product
-    private void addProduct() {
+    private void addAccount() {
         JPanel panel = new JPanel(new GridLayout(0, 2));
 
-        JTextField nameField = new JTextField();
-        JTextField priceField = new JTextField();
-        JTextField categoryField = new JTextField();
-        JTextField descriptionField = new JTextField();
-        JTextField nalichieField = new JTextField();
+        JTextField usernameField = new JTextField();
+        JPasswordField passwordField = new JPasswordField();
+        JTextField roleField = new JTextField();
 
-        panel.add(new JLabel("Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Price:"));
-        panel.add(priceField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryField);
-        panel.add(new JLabel("Description:"));
-        panel.add(descriptionField);
-        panel.add(new JLabel("Stock:"));
-        panel.add(nalichieField);
+        // JDateChooser for selecting the date
+        JDateChooser dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("yyyy-MM-dd");
 
-        int option = JOptionPane.showConfirmDialog(frame, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION);
+        panel.add(new JLabel("Username:"));
+        panel.add(usernameField);
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+        panel.add(new JLabel("Role:"));
+        panel.add(roleField);
+        panel.add(new JLabel("Creation Date:"));
+        panel.add(dateChooser);
+
+        int option = JOptionPane.showConfirmDialog(frame, panel, "Add Account", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            String name = nameField.getText();
-            double price = Double.parseDouble(priceField.getText());
-            String category = categoryField.getText();
-            String description = descriptionField.getText();
-            int nalichie = Integer.parseInt(nalichieField.getText());
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            String role = roleField.getText();
 
-            Product product = new Product(name, price, category, description, nalichie);
-            productService.addProduct(product);
-            loadAllProducts();
-        }
-    }
+            // Get the selected date from the JDateChooser
+            java.util.Date selectedDate = dateChooser.getDate();
+            if (selectedDate != null) {
+                LocalDate creationDate = new java.sql.Date(selectedDate.getTime()).toLocalDate();
+                AccountDAO accountDAO = new AccountDAO();
 
-    // Method to update an existing product
-    private void updateProduct() {
-        int row = productTable.getSelectedRow();
-        if (row != -1) {
-            Long articul = (Long) productTable.getValueAt(row, 0);
-            Product product = productService.getProductByArticul(articul);
+                Account account = new Account(username, password, role, creationDate);
+                accountDAO.save(account);
+                loadAllAccounts();
 
-            JPanel panel = new JPanel(new GridLayout(0, 2));
-
-            JTextField nameField = new JTextField(product.getName());
-            JTextField priceField = new JTextField(String.valueOf(product.getPrice()));
-            JTextField categoryField = new JTextField(product.getCategory());
-            JTextField descriptionField = new JTextField(product.getDescription());
-            JTextField nalichieField = new JTextField(String.valueOf(product.getNalichie()));
-
-            panel.add(new JLabel("Name:"));
-            panel.add(nameField);
-            panel.add(new JLabel("Price:"));
-            panel.add(priceField);
-            panel.add(new JLabel("Category:"));
-            panel.add(categoryField);
-            panel.add(new JLabel("Description:"));
-            panel.add(descriptionField);
-            panel.add(new JLabel("Stock:"));
-            panel.add(nalichieField);
-
-            int option = JOptionPane.showConfirmDialog(frame, panel, "Update Product", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                product.setName(nameField.getText());
-                product.setPrice(Double.parseDouble(priceField.getText()));
-                product.setCategory(categoryField.getText());
-                product.setDescription(descriptionField.getText());
-                product.setNalichie(Integer.parseInt(nalichieField.getText()));
-
-                productService.updateProduct(product);
-                loadAllProducts();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a valid date.");
             }
         }
     }
 
-    // Method to delete a product
-    private void deleteProduct() {
-        int row = productTable.getSelectedRow();
+    private void updateAccount() {
+        int row = accountTable.getSelectedRow();
         if (row != -1) {
-            Long articul = (Long) productTable.getValueAt(row, 0);
-            productService.deleteProduct(articul);
-            loadAllProducts();
+            Long id = (Long) accountTable.getValueAt(row, 0);
+            Account account = accountDAO.findById(id.intValue());
+
+            JPanel panel = new JPanel(new GridLayout(0, 2));
+
+            JTextField usernameField = new JTextField(account.getUsername());
+            JTextField passwordField = new JTextField(account.getPassword());
+            JTextField roleField = new JTextField(account.getRole());
+            JTextField creationDateField = new JTextField(account.getCreationDate().toString());
+
+            panel.add(new JLabel("Username:"));
+            panel.add(usernameField);
+            panel.add(new JLabel("Password:"));
+            panel.add(passwordField);
+            panel.add(new JLabel("Role:"));
+            panel.add(roleField);
+            panel.add(new JLabel("Creation Date (YYYY-MM-DD):"));
+            panel.add(creationDateField);
+
+            int option = JOptionPane.showConfirmDialog(frame, panel, "Update Account", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                account.setUsername(usernameField.getText());
+                account.setPassword(passwordField.getText());
+                account.setRole(roleField.getText());
+                account.setCreationDate(LocalDate.parse(creationDateField.getText()));
+
+                accountDAO.update(account);
+                loadAllAccounts();
+            }
+        }
+    }
+
+    private void deleteAccount() {
+        int row = accountTable.getSelectedRow();
+        if (row != -1) {
+            Long id = (Long) accountTable.getValueAt(row, 0);
+            Account account = accountDAO.findById(id.intValue());
+            accountDAO.delete(account);
+            loadAllAccounts();
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new WarehouseApp();
-            }
-        });
+        SwingUtilities.invokeLater(WarehouseApp::new);
     }
 }

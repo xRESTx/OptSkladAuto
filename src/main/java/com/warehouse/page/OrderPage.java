@@ -2,8 +2,10 @@ package com.warehouse.page;
 
 import com.warehouse.dao.OrderDAO;
 import com.warehouse.dao.OrderItemDAO;
+import com.warehouse.dao.ProductDAO;
 import com.warehouse.entities.Order;
 import com.warehouse.entities.OrderItem;
+import com.warehouse.entities.Product;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,9 +14,12 @@ import java.util.List;
 
 public class OrderPage {
 
-    public static void showOrdersPage(String clientFullName, int clientId) {
-        JFrame frame = createFrame("Orders", 800, 600);
+    private static Order currentOrder = null;
 
+    public static void showOrdersPage(String clientFullName, int clientId) {
+
+        JFrame frame = createFrame("Orders", 800, 600);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JLabel label = new JLabel("Orders for " + clientFullName);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(label, BorderLayout.NORTH);
@@ -36,113 +41,163 @@ public class OrderPage {
         buttonPanel.add(viewOrderButton);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
-        createOrderButton.addActionListener(e -> showCreateOrderPage(clientId, model));
-        viewOrderButton.addActionListener(e -> viewOrderDetails(ordersTable, model));
+        // Обработчик для создания нового заказа
+        createOrderButton.addActionListener(e -> {
+            currentOrder = null; // Сбрасываем текущий заказ, чтобы создать новый
+            showCreateOrderPage(clientId, model);
+        });
+
+        // Обработчик для просмотра и редактирования существующего заказа
+        viewOrderButton.addActionListener(e -> {
+            int selectedRow = ordersTable.getSelectedRow();
+            if (selectedRow != -1) {
+                int orderId = (int) model.getValueAt(selectedRow, 0);
+                OrderDAO orderDAO1 = new OrderDAO();
+                currentOrder = orderDAO1.findById(orderId); // Загружаем выбранный заказ
+                if (currentOrder != null) {
+                    showOrderDetails(currentOrder); // Открываем детали существующего заказа
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to load order.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select an order to view.");
+            }
+        });
 
         frame.setVisible(true);
     }
 
     private static void showCreateOrderPage(int clientId, DefaultTableModel ordersTableModel) {
         JFrame frame = createFrame("Create Order", 600, 400);
-
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JLabel label = new JLabel("Create New Order");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(label, BorderLayout.NORTH);
 
-        DefaultTableModel model = new DefaultTableModel(new String[]{"Product ID", "Quantity"}, 0);
-        JTable itemsTable = new JTable(model);
-        frame.add(new JScrollPane(itemsTable), BorderLayout.CENTER);
+        // Таблица для выбора товаров
+        DefaultTableModel productsModel = new DefaultTableModel(new String[]{"Product ID", "Product Name", "Stock Quantity"}, 0);
+        JTable productsTable = new JTable(productsModel);
+        frame.add(new JScrollPane(productsTable), BorderLayout.CENTER);
 
+        // Получение списка товаров и их количество
+        ProductDAO productDAO = new ProductDAO();
+        List<Product> products = productDAO.findAll();
+        for (Product product : products) {
+            productsModel.addRow(new Object[]{product.getId(), product.getName(), product.getStockQuantity()});
+        }
+
+        // Панель для кнопок
         JPanel buttonPanel = new JPanel();
         JButton addItemButton = new JButton("Add Item");
-        JButton saveOrderButton = new JButton("Save Order");
+        JButton closeButton = new JButton("Cancel");
 
         buttonPanel.add(addItemButton);
-        buttonPanel.add(saveOrderButton);
+        buttonPanel.add(closeButton);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
-        addItemButton.addActionListener(e -> addItemToTable(frame, model));
-        saveOrderButton.addActionListener(e -> saveOrder(frame, clientId, model, ordersTableModel));
+        // Список добавленных товаров
+        DefaultTableModel orderItemsModel = new DefaultTableModel(new String[]{"Product ID", "Product Name", "Quantity"}, 0);
+        JTable orderItemsTable = new JTable(orderItemsModel);
+        frame.add(new JScrollPane(orderItemsTable), BorderLayout.EAST);
+
+        // Создаем объект DAO для добавления товаров в заказ
+        OrderItemDAO orderItemDAO = new OrderItemDAO();
+
+        // Обработчик для добавления товара в заказ
+        addItemButton.addActionListener(e -> {
+            if (currentOrder == null) {
+                // Создание нового заказа, если он еще не создан
+                OrderDAO orderDAO = new OrderDAO();
+                currentOrder = orderDAO.createOrder(clientId); // Создаем заказ только один раз
+                if (currentOrder == null) {
+                    JOptionPane.showMessageDialog(frame, "Failed to create order.");
+                    return;
+                }
+            }
+
+            int selectedRow = productsTable.getSelectedRow();
+            if (selectedRow != -1) {
+                int productId = (int) productsModel.getValueAt(selectedRow, 0);
+                String quantityStr = JOptionPane.showInputDialog(frame, "Enter quantity (available: " + productsModel.getValueAt(selectedRow, 2) + "):");
+                if (quantityStr != null) {
+                    try {
+                        int quantity = Integer.parseInt(quantityStr);
+
+                        // Получение продукта для проверки доступного количества
+                        Product product = productDAO.findById(productId);
+                        if (product != null && quantity <= product.getStockQuantity()) {
+                            // Передаем заказ в метод для добавления элемента
+                            OrderItem newItem = orderItemDAO.addItemToOrder(currentOrder, productId, quantity); // Передаем объект заказа
+
+                            if (newItem != null) {
+                                orderItemsModel.addRow(new Object[]{
+                                        newItem.getProduct().getId(),
+                                        newItem.getProduct().getName(),
+                                        newItem.getQuantity()
+                                });
+                                JOptionPane.showMessageDialog(frame, "Item added to order!");
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Failed to add item to order.");
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(frame, "Not enough stock available.");
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid quantity entered.");
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a product to add.");
+            }
+        });
+
+        // Обработчик для закрытия окна
+        closeButton.addActionListener(e -> {
+            currentOrder = null;  // Сброс текущего заказа
+            frame.dispose();      // Закрытие окна
+        });
 
         frame.setVisible(true);
     }
 
-    private static void showOrderDetailsPage(int orderId) {
-        JFrame frame = createFrame("Order Details", 600, 400);
+    private static void showOrderDetails(Order order) {
+        JFrame frame = new JFrame("Order Details");
+        frame.setSize(800, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Изменено на DISPOSE_ON_CLOSE
 
-        JLabel label = new JLabel("Order Details for Order ID: " + orderId);
+        JLabel label = new JLabel("Order #" + order.getId() + " Details");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(label, BorderLayout.NORTH);
 
+        // Таблица с товарами заказа
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Product Name", "Quantity", "Price"}, 0);
         OrderItemDAO orderItemDAO = new OrderItemDAO();
-        List<OrderItem> items = orderItemDAO.findByOrderId(orderId);
+        List<OrderItem> orderItems = orderItemDAO.findByOrderId(order.getId());
+        for (OrderItem item : orderItems) {
+            model.addRow(new Object[]{item.getProduct().getName(), item.getQuantity(), item.getProduct().getPrice()});
+        }
+        JTable orderItemsTable = new JTable(model);
+        frame.add(new JScrollPane(orderItemsTable), BorderLayout.CENTER);
 
-        DefaultTableModel model = new DefaultTableModel(new String[]{"Product ID", "Quantity"}, 0);
-        items.forEach(item -> model.addRow(new Object[]{item.getProduct().getId(), item.getQuantity()}));
+        // Панель для добавления новых товаров
+        JPanel buttonPanel = new JPanel();
+        JButton addItemButton = new JButton("Add Item");
+        buttonPanel.add(addItemButton);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
 
-        frame.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+        // Обработчик для добавления товара в заказ
+        addItemButton.addActionListener(e -> {
+            showCreateOrderPage(order.getClient().getClientId(), model); // Позволяет добавить товары в текущий заказ
+        });
+
         frame.setVisible(true);
-    }
-
-    private static void addItemToTable(JFrame frame, DefaultTableModel model) {
-        try {
-            String productId = JOptionPane.showInputDialog(frame, "Enter Product ID:");
-            String quantity = JOptionPane.showInputDialog(frame, "Enter Quantity:");
-            if (productId != null && quantity != null) {
-                model.addRow(new Object[]{Integer.parseInt(productId), Integer.parseInt(quantity)});
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(frame, "Invalid input!");
-        }
-    }
-
-    private static void saveOrder(JFrame frame, int clientId, DefaultTableModel itemsModel, DefaultTableModel ordersTableModel) {
-        OrderDAO orderDAO = new OrderDAO();
-        OrderItemDAO orderItemDAO = new OrderItemDAO();
-
-        try {
-            Order newOrder = orderDAO.createOrder(clientId);
-            if (newOrder == null) throw new RuntimeException("Failed to create order.");
-
-            double totalAmount = 0.0;
-            for (int i = 0; i < itemsModel.getRowCount(); i++) {
-                int productId = (int) itemsModel.getValueAt(i, 0);
-                int quantity = (int) itemsModel.getValueAt(i, 1);
-                OrderItem orderItem = orderItemDAO.addItemToOrder(newOrder, productId, quantity);
-                totalAmount += calculateItemTotal(productId, quantity);
-            }
-
-            newOrder.setAmount(totalAmount);
-            orderDAO.update(newOrder);
-
-            ordersTableModel.addRow(new Object[]{newOrder.getId(), newOrder.getStatus(), totalAmount, newOrder.getOrderDate()});
-            JOptionPane.showMessageDialog(frame, "Order created successfully!");
-            frame.dispose();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Error saving order: " + ex.getMessage());
-        }
     }
 
     private static JFrame createFrame(String title, int width, int height) {
         JFrame frame = new JFrame(title);
         frame.setSize(width, height);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  // Изменено на DO_NOTHING_ON_CLOSE
         frame.setLocationRelativeTo(null);
         return frame;
-    }
-
-    private static double calculateItemTotal(int productId, int quantity) {
-        // TODO: Add actual price calculation logic
-        return 10.0 * quantity; // Placeholder
-    }
-
-    private static void viewOrderDetails(JTable ordersTable, DefaultTableModel model) {
-        int selectedRow = ordersTable.getSelectedRow();
-        if (selectedRow != -1) {
-            int orderId = (int) model.getValueAt(selectedRow, 0);
-            showOrderDetailsPage(orderId);
-        } else {
-            JOptionPane.showMessageDialog(null, "Please select an order to view.");
-        }
     }
 }

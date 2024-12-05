@@ -1,37 +1,37 @@
-package com.warehouse.entity;
+package com.warehouse.entities;
 
 import javax.persistence.*;
-import java.util.Optional;
 
 @Entity
-@Table(name = "Клиенты")
+@Table(name = "Clients")
 public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_клиента")
-    private Long id;
+    @Column(name = "client_id")
+    private int clientId;
 
-    @Column(name = "фио", nullable = false, length = 100)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "номер_телефона", length = 15)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "электронная_почта", length = 100)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "адрес", columnDefinition = "TEXT")
+    @Column(name = "address")
     private String address;
 
     @ManyToOne
-    @JoinColumn(name = "id_учетной_записи", nullable = false)
-    private Account account; // Ссылка на сущность Account, которая представляет учетную запись
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
-    // Конструкторы, геттеры и сеттеры
+    // Конструктор по умолчанию
+    public Client() {
+    }
 
-    public Client() {}
-
+    // Конструктор с параметрами
     public Client(String fullName, String phoneNumber, String email, String address, Account account) {
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
@@ -40,12 +40,13 @@ public class Client {
         this.account = account;
     }
 
-    public Long getId() {
-        return id;
+    // Getters и Setters
+    public int getClientId() {
+        return clientId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public String getFullName() {

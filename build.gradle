@@ -21,10 +21,11 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
     implementation 'org.slf4j:slf4j-api:1.7.32'
     implementation 'org.slf4j:slf4j-simple:1.7.32'
-    implementation 'com.h2database:h2:2.1.214' // ??? ???????????? ? H2
+    implementation 'com.h2database:h2:2.1.214'
     testImplementation 'junit:junit:4.13.2'
     implementation group: 'org.openjfx', name: 'javafx-swing', version: '24-ea+15'
-
+    implementation 'org.postgresql:postgresql:42.7.4'
+    implementation 'com.toedter:jcalendar:1.4'
 }
 
 application {

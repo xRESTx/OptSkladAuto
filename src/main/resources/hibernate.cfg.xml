@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-
     <session-factory>
         <!-- JDBC Database connection settings -->
-        <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mariadb://localhost:3306/warehouse_db</property>
-        <property name="hibernate.connection.username">warehouse_user</property>
-        <property name="hibernate.connection.password">admin</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/Kursovaya?charSet=UTF8</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">your_password_here</property>
 
         <!-- JDBC connection pool settings -->
         <property name="hibernate.c3p0.min_size">5</property>
@@ -16,23 +16,32 @@
         <property name="hibernate.c3p0.max_statements">50</property>
         <property name="hibernate.c3p0.idle_test_period">3000</property>
 
-        <!-- Specify dialect -->
-        <property name="hibernate.dialect">org.hibernate.dialect.MariaDB103Dialect</property>
-
         <!-- Enable Hibernate's automatic session context management -->
         <property name="hibernate.current_session_context_class">thread</property>
 
         <!-- Echo all executed SQL to stdout -->
         <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
 
         <!-- Drop and re-create the database schema on startup -->
         <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!-- Disable the second-level cache -->
-        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 
-        <!-- Enable Hibernate's automatic session context management -->
-        <property name="hibernate.c3p0.validate">true</property>
-
+        <!-- Маппинг сущностей -->
+        <mapping class="com.warehouse.entities.Account"/>
+        <mapping class="com.warehouse.entities.Client"/>
+        <mapping class="com.warehouse.entities.Contract"/>
+        <mapping class="com.warehouse.entities.Delivery"/>
+        <mapping class="com.warehouse.entities.Department"/>
+        <mapping class="com.warehouse.entities.Employee"/>
+        <mapping class="com.warehouse.entities.Order"/>
+        <mapping class="com.warehouse.entities.OrderItem"/>
+        <mapping class="com.warehouse.entities.Payment"/>
+        <mapping class="com.warehouse.entities.Position"/>
+        <mapping class="com.warehouse.entities.Product"/>
+        <mapping class="com.warehouse.entities.Request"/>
+        <mapping class="com.warehouse.entities.Supplier"/>
     </session-factory>
 </hibernate-configuration>
