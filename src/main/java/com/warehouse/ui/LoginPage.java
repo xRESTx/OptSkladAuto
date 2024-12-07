@@ -4,10 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import com.warehouse.dao.AccountDAO;
 import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.models.Account;
 import com.warehouse.models.Employee;
+import com.warehouse.utils.*;
+
+
+import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginPage {
 
@@ -52,18 +57,25 @@ public class LoginPage {
                 String password = new String(passwordField.getPassword());
 
                 if (checkEmployeeCredentials(login, password)) {
+                    // Сохраняем логин текущего пользователя
+                    SessionManager.setCurrentUserLogin(login);
+
                     // Если пользователь - сотрудник (Employee), открываем весь функционал
                     new AdminMainPage();
-                    frame.dispose();// Главная страница для сотрудников
+                    frame.dispose(); // Главная страница для сотрудников
                 } else if (checkAccountCredentials(login, password)) {
+                    // Сохраняем логин текущего пользователя
+                    SessionManager.setCurrentUserLogin(login);
+
                     // Если пользователь - клиент (Account), открываем ограниченный функционал
                     new UserMainPage().setVisible(true);
-                    frame.dispose();// Страница с ограниченным функционалом
+                    frame.dispose(); // Страница с ограниченным функционалом
                 } else {
                     // Неверный логин/пароль
                     JOptionPane.showMessageDialog(frame, "Неверный логин или пароль!", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             }
+
         });
 
         // Обработчик нажатия кнопки "Отмена"
@@ -83,8 +95,8 @@ public class LoginPage {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         Employee employee = employeeDAO.getEmployeeByLogin(login);
 
-        // Проверяем, существует ли сотрудник и совпадает ли пароль
-        if (employee != null && employee.getPassword().equals(password)) {
+        // Проверяем, существует ли сотрудник и совпадает ли пароль (BCrypt)
+        if (employee != null && BCrypt.checkpw(password, employee.getPassword())) {
             return true;
         }
         return false;
@@ -95,8 +107,8 @@ public class LoginPage {
         AccountDAO accountDAO = new AccountDAO();
         Account account = accountDAO.getAccountByLogin(login);
 
-        // Проверяем, существует ли аккаунт и совпадает ли пароль
-        if (account != null && account.getPassword().equals(password)) {
+        // Проверяем, существует ли аккаунт и совпадает ли пароль (BCrypt)
+        if (account != null && BCrypt.checkpw(password, account.getPassword())) {
             return true;
         }
         return false;

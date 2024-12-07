@@ -154,7 +154,12 @@ public class EmployeesPage extends JFrame {
             data[i][6] = emp.getContract().getPosition();
             data[i][7] = emp.getDepartment() != null ? emp.getDepartment().getName() : "N/A";
         }
-        DefaultTableModel model = new DefaultTableModel(data, columnNames);
+        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Запрещает редактирование всех ячеек
+            }
+        };
         employeesTable.setModel(model);
 
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);

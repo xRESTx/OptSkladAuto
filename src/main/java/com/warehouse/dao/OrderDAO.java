@@ -42,14 +42,15 @@ public class OrderDAO {
     }
 
     // Получение товаров, связанных с заказом
-    public static List<OrderComponent> findOrderItems(int numberOrder) {
+    public Order findOrderWithComponents(int orderNumber) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM OrderComponent oc WHERE oc.order.numberOrder = :numberOrder";
-            Query<OrderComponent> query = session.createQuery(hql, OrderComponent.class);
-            query.setParameter("numberOrder", numberOrder);
-            return query.getResultList();
+            return session.createQuery(
+                            "SELECT o FROM Order o LEFT JOIN FETCH o.components WHERE o.numberOrder = :orderNumber", Order.class)
+                    .setParameter("orderNumber", orderNumber)
+                    .uniqueResult();
         }
     }
+
 
     // Получение всех заказов
     public static List<Order> findAll() {
@@ -160,6 +161,10 @@ public class OrderDAO {
         }
     }
     public static int createOrder(Order order) {
+        if (order == null) {
+            throw new IllegalArgumentException("Order cannot be null");
+        }
+
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = null;
         int orderId = 0;
@@ -170,13 +175,17 @@ public class OrderDAO {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
-                transaction.rollback();
+                transaction.rollback(); // Откатываем транзакцию в случае ошибки
             }
+            System.err.println("Error occurred while saving order: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            session.close();
+            if (session != null && session.isOpen()) {
+                session.close(); // Закрываем сессию
+            }
         }
 
         return orderId; // Возвращаем ID нового заказа
     }
+
 }

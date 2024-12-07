@@ -1,6 +1,7 @@
 package com.warehouse.ui;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
@@ -180,7 +181,13 @@ public class PaymentsPage extends JFrame {
         }
 
         // Устанавливаем модель таблицы с новыми данными
-        paymentsTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
+        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Запрещает редактирование всех ячеек
+            }
+        };
+        paymentsTable.setModel(model);
     }
 
 

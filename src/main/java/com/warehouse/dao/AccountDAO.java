@@ -23,7 +23,7 @@ public class AccountDAO {
         }
     }
 
-    public Account findById(String login) {
+    public static Account findById(String login) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Account.class, login);  // Получаем Account по ID
         }

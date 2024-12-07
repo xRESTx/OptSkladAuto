@@ -38,7 +38,7 @@ public class OrderComponentDAO {
         }
     }
 
-    public OrderComponent findById(int numberOrder) {
+    public static OrderComponent findById(int numberOrder) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(OrderComponent.class, numberOrder);
         }
@@ -90,4 +90,14 @@ public class OrderComponentDAO {
             e.printStackTrace();
         }
     }
+    public static List<OrderComponent> findComponentsByOrderNumber(int orderNumber) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                            "SELECT oc FROM OrderComponent oc JOIN FETCH oc.autotovar WHERE oc.order.numberOrder = :orderNumber",
+                            OrderComponent.class)
+                    .setParameter("orderNumber", orderNumber)
+                    .getResultList();
+        }
+    }
+
 }

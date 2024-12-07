@@ -5,12 +5,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.warehouse.dao.AutotovarDAO;
+import com.warehouse.dao.*;
 import com.warehouse.dao.OrderDAO;
 import com.warehouse.dao.OrderComponentDAO;
+import com.warehouse.models.Account;
 import com.warehouse.models.Autotovar;
 import com.warehouse.models.Order;
 import com.warehouse.models.OrderComponent;
+import com.warehouse.utils.*;
 
 public class UserMainPage extends JFrame {
     private JPanel autotovarPanel;
@@ -190,9 +192,20 @@ public class UserMainPage extends JFrame {
             return;
         }
 
+        // Запрашиваем комментарий к заказу у пользователя
+        String comment = JOptionPane.showInputDialog(this, "Leave a comment for your order:", "Order Comment", JOptionPane.PLAIN_MESSAGE);
+
+        // Устанавливаем логин текущего пользователя
+        String currentLogin = SessionManager.getCurrentUserLogin();
+        Account account = AccountDAO.findById(currentLogin);
+
         // Создаем новый заказ
-        Order newOrder = new Order(); // Создаем новый заказ
-        newOrder.setStatus("Pending"); // Статус заказа
+        Order newOrder = new Order();
+        newOrder.setStatus("Pending");
+        newOrder.setAccount(account);
+        newOrder.setRemark(comment); // Устанавливаем комментарий
+
+
 
         // Добавляем заказ в базу данных
         int orderId = OrderDAO.createOrder(newOrder);
@@ -204,26 +217,21 @@ public class UserMainPage extends JFrame {
 
             // Создаем новый объект OrderComponent
             OrderComponent orderComponent = new OrderComponent();
-
-            // Устанавливаем заказ (объект Order)
-            orderComponent.setOrders(newOrder);  // order - это объект текущего заказа
-
-            // Устанавливаем автотовар (объект Autotovar)
-            orderComponent.setAutotovar(autotovar);
-
-            // Устанавливаем количество
-            orderComponent.setCount(cartItem.getQuantity());
+            orderComponent.setOrders(newOrder); // Устанавливаем текущий заказ
+            orderComponent.setAutotovar(autotovar); // Устанавливаем автотовар
+            orderComponent.setCount(cartItem.getQuantity()); // Устанавливаем количество
 
             // Добавляем компонент заказа в базу данных
             OrderComponentDAO.addOrderComponent(orderComponent);
         }
 
-
         // Очистка корзины
         cartItems.clear();
 
         JOptionPane.showMessageDialog(this, "Order placed successfully! Your order ID is " + orderId);
+        loadAutotovars();
     }
+
 
     private void loadAutotovars() {
         List<Autotovar> autotovars = AutotovarDAO.findAll();
