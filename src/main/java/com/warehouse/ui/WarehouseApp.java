@@ -4,8 +4,8 @@ public class WarehouseApp {
 
     public static void main(String[] args) {
         // Запуск страницы входа
-        new LoginPage(); // Страница входа
-        //new MainPage();
+        //new LoginPage(); // Страница входа
+        new AdminMainPage();
         //new UserMainPage();
     }
 }

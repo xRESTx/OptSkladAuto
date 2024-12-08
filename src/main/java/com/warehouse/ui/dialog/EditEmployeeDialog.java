@@ -13,8 +13,7 @@ import java.util.Date;
 public class EditEmployeeDialog extends JDialog {
 
     private JTextField passportDataField, loginField, lastNameField, firstNameField, middleNameField;
-    private JTextField birthdayField, passwordField;
-    private JComboBox<Contract> contractBox;
+    private JTextField birthdayField, passwordField, contractField;
     private JComboBox<Department> departmentBox;
 
     private Employee employee;
@@ -57,16 +56,20 @@ public class EditEmployeeDialog extends JDialog {
 
         formPanel.add(new JLabel("Password:"));
         passwordField = new JTextField(employee.getPassword());
+        passwordField.setEditable(false);
         formPanel.add(passwordField);
 
         formPanel.add(new JLabel("Contract:"));
-        contractBox = new JComboBox<>(EmployeeDAO.loadContracts().toArray(new Contract[0]));
-        contractBox.setSelectedItem(employee.getContract());
-        formPanel.add(contractBox);
+        contractField = new JTextField(String.valueOf(employee.getContract().getContractNumber()));
+        contractField.setEditable(false);
+        formPanel.add(contractField);
 
         formPanel.add(new JLabel("Department:"));
-        departmentBox = new JComboBox<>(EmployeeDAO.loadDepartments().toArray(new Department[0]));
-        departmentBox.setSelectedItem(employee.getDepartment());
+        departmentBox = new JComboBox<>();
+        populateDepartmentBox();
+        Department selectedDepartment = (Department) departmentBox.getSelectedItem();
+        departmentBox.setName(String.valueOf(selectedDepartment));
+
         formPanel.add(departmentBox);
 
         add(formPanel, BorderLayout.CENTER);
@@ -83,6 +86,24 @@ public class EditEmployeeDialog extends JDialog {
         buttonPanel.add(cancelButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void populateDepartmentBox() {
+        DefaultComboBoxModel<Department> model = new DefaultComboBoxModel<>();
+
+        // Предполагается, что метод возвращает список департаментов
+        java.util.List<Department> departments = EmployeeDAO.loadDepartments();
+
+        for (Department department : departments) {
+            model.addElement(department);
+        }
+
+        departmentBox.setModel(model);
+
+        // Устанавливаем текущий департамент сотрудника
+        if (employee.getDepartment() != null) {
+            departmentBox.setSelectedItem(employee.getDepartment());
+        }
     }
 
     private void saveEmployee() {
