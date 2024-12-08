@@ -29,13 +29,13 @@ public class DepartmentDAO {
         }
     }
 
-    public List<Department> findAll() {
+    public static List<Department> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM Department", Department.class).list();
         }
     }
 
-    public void update(Department department) {
+    public static void update(Department department) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -49,7 +49,7 @@ public class DepartmentDAO {
         }
     }
 
-    public void delete(Department department) {
+    public static void delete(Department department) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -60,6 +60,67 @@ public class DepartmentDAO {
                 transaction.rollback();
             }
             e.printStackTrace();
+        }
+    }
+
+    public static void deleteDepartmentById(int departmentId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Проверка, привязан ли департамент к сотрудникам
+            long count = (long) session.createQuery("SELECT COUNT(e) FROM Employee e WHERE e.department.id = :departmentId")
+                    .setParameter("departmentId", departmentId)
+                    .uniqueResult();
+
+            if (count > 0) {
+                // Если департамент привязан к сотрудникам, то не удаляем его
+                System.out.println("Cannot delete department. It has linked employees.");
+                return; // Возвращаемся, не удаляя департамент
+            }
+
+            // Получаем департамент по ID
+            Department department = session.get(Department.class, departmentId);
+            if (department != null) {
+                // Удаляем департамент
+                session.delete(department);
+                System.out.println("Department deleted successfully.");
+            } else {
+                System.out.println("Department not found.");
+            }
+
+            // Завершаем транзакцию
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public static void addDepartment(Department department) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            // Сохраняем новый департамент в базе данных
+            session.save(department);
+
+            // Завершаем транзакцию
+            transaction.commit();
+
+            System.out.println("Department added successfully.");
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 }
