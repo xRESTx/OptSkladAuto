@@ -4,12 +4,29 @@ import com.warehouse.models.Accessories;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
 public class AccessoriesDAO {
 
-    public void save(Accessories accessories) {
+    // Метод для получения всех товаров категории Accessories
+    public static List<Accessories> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Accessories> query = session.createQuery("from Accessories", Accessories.class);
+            return query.list();
+        }
+    }
+
+    // Метод для получения товара по articul
+    public Accessories findById(int articul) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Accessories.class, articul);
+        }
+    }
+
+    // Метод для добавления нового товара
+    public static void save(Accessories accessories) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -23,18 +40,7 @@ public class AccessoriesDAO {
         }
     }
 
-    public Accessories findById(int articul) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Accessories.class, articul);
-        }
-    }
-
-    public List<Accessories> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Accessories", Accessories.class).list();
-        }
-    }
-
+    // Метод для обновления данных товара
     public void update(Accessories accessories) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -49,6 +55,7 @@ public class AccessoriesDAO {
         }
     }
 
+    // Метод для удаления товара
     public void delete(Accessories accessories) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -59,6 +66,27 @@ public class AccessoriesDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
+            e.printStackTrace();
+        }
+    }
+
+    // Метод для обновления конкретных данных товара по articul
+    public static void updateRow(int articul, Accessories updatedAccessories) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            Accessories accessories = session.get(Accessories.class, articul);
+            if (accessories != null) {
+                accessories.setSubcategory(updatedAccessories.getSubcategory());
+                accessories.setVendor(updatedAccessories.getVendor());
+                accessories.setMaterial(updatedAccessories.getMaterial());
+                accessories.setColour(updatedAccessories.getColour());
+                accessories.setSize(updatedAccessories.getSize());
+                accessories.setFeatures(updatedAccessories.getFeatures());
+                accessories.setAppointment(updatedAccessories.getAppointment());
+                session.update(accessories);
+                session.getTransaction().commit();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

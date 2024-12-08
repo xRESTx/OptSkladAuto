@@ -4,12 +4,29 @@ import com.warehouse.models.Wheels;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.List;
 
 public class WheelsDAO {
 
-    public void save(Wheels wheels) {
+    // Метод для получения всех товаров категории Wheels
+    public static List<Wheels> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Wheels> query = session.createQuery("from Wheels", Wheels.class);
+            return query.list();
+        }
+    }
+
+    // Метод для получения товара по articul
+    public Wheels findById(int articul) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Wheels.class, articul);
+        }
+    }
+
+    // Метод для добавления нового товара
+    public static void save(Wheels wheels) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -23,18 +40,7 @@ public class WheelsDAO {
         }
     }
 
-    public Wheels findById(int articul) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Wheels.class, articul);
-        }
-    }
-
-    public List<Wheels> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Wheels", Wheels.class).list();
-        }
-    }
-
+    // Метод для обновления данных товара
     public void update(Wheels wheels) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -49,6 +55,7 @@ public class WheelsDAO {
         }
     }
 
+    // Метод для удаления товара
     public void delete(Wheels wheels) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -59,6 +66,27 @@ public class WheelsDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
+            e.printStackTrace();
+        }
+    }
+
+    // Метод для обновления конкретных данных товара по articul
+    public static void updateRow(int articul, Wheels updatedWheels) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            Wheels wheels = session.get(Wheels.class, articul);
+            if (wheels != null) {
+                wheels.setSubcategory(updatedWheels.getSubcategory());
+                wheels.setVendor(updatedWheels.getVendor());
+                wheels.setMaterial(updatedWheels.getMaterial());
+                wheels.setSize(updatedWheels.getSize());
+                wheels.setSeasonality(updatedWheels.getSeasonality());
+                wheels.setColour(updatedWheels.getColour());
+                wheels.setProtector(updatedWheels.getProtector());
+                session.update(wheels);
+                session.getTransaction().commit();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

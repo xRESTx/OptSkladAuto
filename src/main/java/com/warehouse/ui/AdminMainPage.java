@@ -32,7 +32,7 @@ public class AdminMainPage {
         JButton paymentsButton = new JButton("Управление платежами");
         JButton departmentButton = new JButton("Управление отделами");
         JButton requestButton = new JButton("Управление запросами");
-
+        JButton CategoryButton = new JButton("Управление категориями");
 
         // Центрируем кнопки
         ordersButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -42,6 +42,7 @@ public class AdminMainPage {
         paymentsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         departmentButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         requestButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        CategoryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Добавляем кнопки на панель
         panel.add(ordersButton);
@@ -57,6 +58,8 @@ public class AdminMainPage {
         panel.add(departmentButton);
         panel.add(Box.createVerticalStrut(10));
         panel.add(requestButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(CategoryButton);
 
         // Добавляем обработчики событий для кнопок
         ordersButton.addActionListener(e -> openOrdersPage(frame));
@@ -66,6 +69,7 @@ public class AdminMainPage {
         paymentsButton.addActionListener(e -> openPaymentsPage(frame));
         departmentButton.addActionListener(e -> openDepartmentPage(frame));
         requestButton.addActionListener(e -> openRequestPage(frame));
+        CategoryButton.addActionListener(e -> openCategoryPage(frame));
 
         // Добавляем панель на окно
         frame.add(panel);
@@ -105,5 +109,9 @@ public class AdminMainPage {
     private void openDepartmentPage(JFrame parentFrame) {
         parentFrame.dispose();
         new DepartmentPage().setVisible(true); // Открываем страницу платежей
+    }
+    private void openCategoryPage(JFrame parentFrame) {
+        parentFrame.dispose();
+        new CategoryPage().setVisible(true); // Открываем страницу платежей
     }
 }

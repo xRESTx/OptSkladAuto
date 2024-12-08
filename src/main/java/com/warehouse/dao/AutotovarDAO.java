@@ -6,7 +6,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class AutotovarDAO {
 
@@ -149,5 +155,12 @@ public class AutotovarDAO {
         }
     }
 
+    public static List<Autotovar> findAllByCategory(String category) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Autotovar> query = session.createQuery("FROM Autotovar WHERE category = :category", Autotovar.class);
+            query.setParameter("category", category);
+            return query.getResultList();
+        }
+    }
 
 }

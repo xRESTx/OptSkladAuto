@@ -80,7 +80,8 @@ public class UserMainPage extends JFrame {
     }
 
     private void showOrders() {
-        // Логика отображения заказов пользователя
+        dispose();
+        new UserOrdersPage().setVisible(true);
     }
 
     private void showRequests() {
