@@ -133,5 +133,23 @@ public static void updatePayment(Payment payment) {
             throw new RuntimeException("Error while saving payment", e);
         }
     }
+    public static List<Payment> findPaymentsByUserLogin(String login) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Payment> payments = null;
 
+        try {
+            // Используем HQL (Hibernate Query Language) для фильтрации платежей по логину
+            String hql = "FROM Payment p WHERE p.order.account.login = :login";
+            Query<Payment> query = session.createQuery(hql, Payment.class);
+            query.setParameter("login", login);
+
+            payments = query.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return payments;
+    }
 }

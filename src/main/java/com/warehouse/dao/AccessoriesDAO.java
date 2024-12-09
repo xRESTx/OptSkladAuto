@@ -90,4 +90,14 @@ public class AccessoriesDAO {
             e.printStackTrace();
         }
     }
+    public static Accessories findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Accessories> query = session.createQuery("FROM Accessories a WHERE a.articul = :articul", Accessories.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }

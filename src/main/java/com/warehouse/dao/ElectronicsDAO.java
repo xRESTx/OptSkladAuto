@@ -90,4 +90,14 @@ public class ElectronicsDAO {
             e.printStackTrace();
         }
     }
+    public static Electronics findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Electronics> query = session.createQuery("FROM Electronics e WHERE e.articul = :articul", Electronics.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }

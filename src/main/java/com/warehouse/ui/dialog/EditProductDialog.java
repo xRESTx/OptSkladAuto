@@ -6,7 +6,7 @@ import com.warehouse.dao.AutotovarDAO;
 import com.warehouse.models.Autotovar;
 
 public class EditProductDialog extends JDialog {
-    private JTextField nameField, costField, stockField, minimumField, descriptionField;
+    private JTextField nameField, costField, stockField, minimumField, descriptionField,categoryField;
     private JComboBox<String> categoryBox;
     private JCheckBox availableCheckBox;
     private int articul;
@@ -33,9 +33,9 @@ public class EditProductDialog extends JDialog {
         add(nameField);
 
         add(new JLabel("Category:"));
-        categoryBox = new JComboBox<>(new String[]{"Chemistry", "Electronics", "Wheels", "Accessories", "Lubricants", "Repair"});
-        categoryBox.setSelectedItem(product.getCategory());
-        add(categoryBox);
+        categoryField = new JTextField(product.getCategory());
+        categoryField.setEditable(false);
+        add(categoryField);
 
         add(new JLabel("Cost:"));
         costField = new JTextField(String.valueOf(product.getCost()));

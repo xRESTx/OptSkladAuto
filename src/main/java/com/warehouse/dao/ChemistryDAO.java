@@ -91,4 +91,14 @@ public class ChemistryDAO {
             e.printStackTrace();
         }
     }
+    public static Chemistry findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Chemistry> query = session.createQuery("FROM Chemistry c WHERE c.articul = :articul", Chemistry.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.warehouse.ui;
 
 import javax.swing.*;
+import javax.validation.constraints.Null;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.warehouse.models.Account;
 import com.warehouse.models.Autotovar;
 import com.warehouse.models.Order;
 import com.warehouse.models.OrderComponent;
+import com.warehouse.ui.dialog.ProductDetailsDialog;
 import com.warehouse.utils.*;
 
 public class UserMainPage extends JFrame {
@@ -53,10 +55,11 @@ public class UserMainPage extends JFrame {
         viewAutotovarsButton = new JButton("View Autotovars");
         checkoutButton = new JButton("Checkout");
 
+        toolbar.add(viewAutotovarsButton);
         toolbar.add(viewOrdersButton);
         toolbar.add(viewRequestsButton);
         toolbar.add(viewPaymentsButton);
-        toolbar.add(viewAutotovarsButton);
+
         toolbar.add(checkoutButton);
 
         // Панель для отображения автотоваров
@@ -73,30 +76,50 @@ public class UserMainPage extends JFrame {
         viewOrdersButton.addActionListener(e -> showOrders());
         viewRequestsButton.addActionListener(e -> showRequests());
         viewPaymentsButton.addActionListener(e -> showPayments());
-        viewAutotovarsButton.addActionListener(e -> showAutotovars());
+        viewAutotovarsButton.addActionListener(e -> filterAutotovars());
         checkoutButton.addActionListener(e -> checkout());
 
         loadAutotovars(); // Загружаем автотовары по умолчанию
     }
+    private void filterAutotovars() {
+        String searchText = searchField.getText().toLowerCase(); // Получаем текст из поля поиска
+        List<Autotovar> autotovars = AutotovarDAO.findAll();
+        if (searchText.isEmpty()) {
+            updateAutotovarCards(autotovars); // Если поиск пустой, показываем все товары
+        } else {
+            // Фильтруем автотовары по имени или описанию
+            List<Autotovar> filteredAutotovars = new ArrayList<>();
+            for (Autotovar autotovar : autotovars) {
+                String description = autotovar.getDescription(); // Получаем описание товара
 
+                // Проверяем, содержится ли поисковая строка в имени или описании товара (с учетом null)
+                if ((autotovar.getName().toLowerCase().contains(searchText)) ||
+                        (description != null && description.toLowerCase().contains(searchText))) {
+                    filteredAutotovars.add(autotovar);
+                }
+            }
+            updateAutotovarCards(filteredAutotovars); // Обновляем карточки с отфильтрованными товарами
+        }
+    }
     private void showOrders() {
         dispose();
         new UserOrdersPage().setVisible(true);
     }
 
     private void showRequests() {
-        // Логика отображения запросов пользователя
+        dispose();
+        new UserRequestsPage().setVisible(true);
     }
 
     private void showPayments() {
-        // Логика отображения оплат пользователя
+        dispose();
+        new UserPaymentsPage().setVisible(true);
     }
 
     private void showAutotovars() {
         List<Autotovar> autotovars = AutotovarDAO.findAll();
         updateAutotovarCards(autotovars);
     }
-
     private void updateAutotovarCards(List<Autotovar> autotovars) {
         autotovarPanel.removeAll(); // Удаляем старые карточки
 
@@ -107,51 +130,101 @@ public class UserMainPage extends JFrame {
 
         for (Autotovar autotovar : autotovars) {
             JPanel cardPanel = new JPanel();
-            cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+            cardPanel.setLayout(new BorderLayout()); // Используем BorderLayout для размещения элементов
             cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+            // Устанавливаем фиксированный размер карточки
+            cardPanel.setPreferredSize(new Dimension(300, 120));
+
+            // Путь к фотографии
+            String photoPath = "C:\\Users\\REST\\IdeaProjects\\OptSkladAuto\\src\\main\\resources\\photo\\" + autotovar.getArticul() + ".jpg";
+
+            // Создаем компонент для фото
+            JLabel photoLabel = new JLabel();
+            photoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+            // Попытка загрузить изображение
+            try {
+                ImageIcon imageIcon = new ImageIcon(photoPath); // Загружаем изображение
+                if (imageIcon.getIconWidth() > 0 && imageIcon.getIconHeight() > 0) { // Проверяем, успешно ли загрузилось изображение
+                    Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING); // Масштабируем изображение
+                    photoLabel.setIcon(new ImageIcon(image)); // Устанавливаем масштабированное изображение
+                } else {
+                    throw new Exception("Image not found or invalid");
+                }
+            } catch (Exception e) {
+                photoLabel.setText("No Image");
+                photoLabel.setPreferredSize(new Dimension(100, 100)); // Устанавливаем фиксированный размер
+            }
+
+            // Добавляем фото в левую часть карточки
+            cardPanel.add(photoLabel, BorderLayout.WEST);
+
+            // Панель для описания и кнопки
+            JPanel infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Добавляем отступы
 
             // Добавляем артикул
             JLabel articulLabel = new JLabel("Art: " + autotovar.getArticul());
-            cardPanel.add(articulLabel);
+            infoPanel.add(articulLabel);
 
             // Название автотовара
             JLabel nameLabel = new JLabel("Name: " + autotovar.getName());
-            cardPanel.add(nameLabel);
+            infoPanel.add(nameLabel);
 
             // Описание
             JLabel descriptionLabel = new JLabel("Description: " + autotovar.getDescription());
-            cardPanel.add(descriptionLabel);
+            infoPanel.add(descriptionLabel);
 
             // Цена
             JLabel priceLabel = new JLabel("Price: $" + autotovar.getCost());
-            cardPanel.add(priceLabel);
+            infoPanel.add(priceLabel);
+
+            // Резервируем место для кнопки или управления количеством
+            JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            actionPanel.setMaximumSize(new Dimension(200, 50)); // Фиксируем высоту панели
+            actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(actionPanel);
 
             // Проверяем, есть ли товар в корзине
             CartItem cartItem = findCartItem(autotovar.getArticul());
 
             if (cartItem != null) {
                 // Товар уже в корзине, показываем кнопки изменения количества
-                JPanel quantityPanel = new JPanel(new FlowLayout());
                 JLabel quantityLabel = new JLabel("Quantity: " + cartItem.getQuantity());
-                quantityPanel.add(quantityLabel);
 
-                // Кнопки для увеличения/уменьшения количества
                 JButton decreaseButton = new JButton("-");
                 decreaseButton.addActionListener(e -> updateQuantity(autotovar.getArticul(), -1));
-                quantityPanel.add(decreaseButton);
 
                 JButton increaseButton = new JButton("+");
                 increaseButton.addActionListener(e -> updateQuantity(autotovar.getArticul(), 1));
-                quantityPanel.add(increaseButton);
 
-                cardPanel.add(quantityPanel);
+                actionPanel.add(quantityLabel);
+                actionPanel.add(decreaseButton);
+                actionPanel.add(increaseButton);
             } else {
                 // Товар еще не в корзине, показываем кнопку "Add to Cart"
                 JButton orderButton = new JButton("Add to Cart");
-                orderButton.addActionListener(e -> addToCart(autotovar.getArticul())); // Добавить в корзину
-                cardPanel.add(orderButton);
+                orderButton.addActionListener(e -> {
+                    addToCart(autotovar.getArticul());
+                    updateAutotovarCards(autotovars); // Перерисовываем панель после добавления в корзину
+                });
+                actionPanel.add(orderButton);
             }
 
+            // Добавляем infoPanel в правую часть карточки
+            cardPanel.add(infoPanel, BorderLayout.CENTER);
+
+            cardPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    if (e.getClickCount() == 2) { // Проверяем, что клик двойной
+                        // Открываем ProductDetailsDialog
+                        showProductDetails(autotovar);
+                    }
+                }
+            });
             // Добавляем карточку на панель
             autotovarPanel.add(cardPanel);
         }
@@ -160,6 +233,15 @@ public class UserMainPage extends JFrame {
         autotovarPanel.revalidate();
         autotovarPanel.repaint();
     }
+
+
+
+
+    private void showProductDetails(Autotovar autotovar) {
+        ProductDetailsDialog dialog = new ProductDetailsDialog(this, autotovar);
+        dialog.setVisible(true);
+    }
+
 
     private void addToCart(int autotovarId) {
         cartItems.add(new CartItem(autotovarId, 1)); // Добавляем товар в корзину с количеством 1

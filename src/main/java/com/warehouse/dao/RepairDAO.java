@@ -90,4 +90,14 @@ public class RepairDAO {
             e.printStackTrace();
         }
     }
+    public static Repair findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Repair> query = session.createQuery("FROM Repair r WHERE r.articul = :articul", Repair.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }

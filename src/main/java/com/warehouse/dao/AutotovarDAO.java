@@ -1,6 +1,6 @@
 package com.warehouse.dao;
 
-import com.warehouse.models.Autotovar;
+import com.warehouse.models.*;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -162,5 +162,33 @@ public class AutotovarDAO {
             return query.getResultList();
         }
     }
+    public static Object findProductDetails(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Autotovar autotovar = session.get(Autotovar.class, articul);
+            if (autotovar == null) {
+                return null;
+            }
 
+            String category = autotovar.getCategory();
+            switch (category.toLowerCase()) {
+                case "chemistry":
+                    return session.get(Chemistry.class, articul);
+                case "electronics":
+                    return session.get(Electronics.class, articul);
+                case "wheels":
+                    return session.get(Wheels.class, articul);
+                case "lubricants":
+                    return session.get(Lubricants.class, articul);
+                case "accessories":
+                    return session.get(Accessories.class, articul);
+                case "repair":
+                    return session.get(Repair.class, articul);
+                default:
+                    return autotovar; // Если категории нет, возвращаем только базовые данные.
+            }
+        } finally {
+            session.close();
+        }
+    }
 }

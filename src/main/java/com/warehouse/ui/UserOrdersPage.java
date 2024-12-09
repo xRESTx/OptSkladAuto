@@ -15,13 +15,13 @@ import com.warehouse.models.Order;
 import com.warehouse.models.OrderComponent;
 import com.warehouse.ui.dialog.EditOrderDialog;
 import com.warehouse.ui.dialog.OrderDetailsDialog;
+import com.warehouse.ui.dialog.UserEditOrderDialog;
 import com.warehouse.utils.SessionManager;
 
 public class UserOrdersPage extends JFrame {
     private JTable ordersTable;
     private JButton backButton;
     private JButton editButton;
-    private JButton deleteButton;
 
     public UserOrdersPage() {
         setTitle("Orders Management");
@@ -33,7 +33,6 @@ public class UserOrdersPage extends JFrame {
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         backButton = new JButton("Назад");
         editButton = new JButton("Edit");
-        deleteButton = new JButton("Delete");
 
         // Кнопка "Назад"
         backButton.addActionListener(e -> {
@@ -44,7 +43,6 @@ public class UserOrdersPage extends JFrame {
         // Добавляем кнопки на панель инструментов
         toolbar.add(backButton);
         toolbar.add(editButton);
-        toolbar.add(deleteButton);
 
         // Таблица заказов
         String[] columnNames = {"Order Number", "Customer", "Date", "Status", "Total Sum", "Remark"};
@@ -66,7 +64,6 @@ public class UserOrdersPage extends JFrame {
 
         // Слушатели для кнопок
         editButton.addActionListener(e -> editOrder());
-        deleteButton.addActionListener(e -> deleteOrder());
 
         // Обработчик двойного клика для открытия деталей заказа
         ordersTable.addMouseListener(new MouseAdapter() {
@@ -150,7 +147,7 @@ public class UserOrdersPage extends JFrame {
         }
 
         int orderNumber = (int) ordersTable.getValueAt(selectedRow, 0);
-        EditOrderDialog dialog = new EditOrderDialog(this, orderNumber);
+        UserEditOrderDialog dialog = new UserEditOrderDialog(this, orderNumber);
         dialog.setVisible(true);
 
         // Обновляем таблицу после возможных изменений

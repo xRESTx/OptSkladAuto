@@ -90,4 +90,14 @@ public class WheelsDAO {
             e.printStackTrace();
         }
     }
+    public static Wheels findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Wheels> query = session.createQuery("FROM Wheels w WHERE w.articul = :articul", Wheels.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }

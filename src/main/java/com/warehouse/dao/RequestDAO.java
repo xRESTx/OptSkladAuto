@@ -5,6 +5,7 @@ import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.persistence.Query;
 import java.util.List;
 
 public class RequestDAO {
@@ -86,4 +87,5 @@ public class RequestDAO {
             e.printStackTrace();
         }
     }
+
 }

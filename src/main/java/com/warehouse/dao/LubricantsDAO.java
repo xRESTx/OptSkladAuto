@@ -90,4 +90,14 @@ public class LubricantsDAO {
             e.printStackTrace();
         }
     }
+    public static Lubricants findByArticul(int articul) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<Lubricants> query = session.createQuery("FROM Lubricants l WHERE l.articul = :articul", Lubricants.class);
+            query.setParameter("articul", articul);
+            return query.uniqueResult();
+        } finally {
+            session.close();
+        }
+    }
 }
