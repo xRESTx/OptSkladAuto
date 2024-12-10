@@ -10,21 +10,14 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "request_id")
     private int id;
-
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = true)
-    private Order order;
-
-    @Column(name = "subject", nullable = false)
-    private String subject;
-
     @Column(name = "description")
     private String description;
-
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
     @Column(name = "status", nullable = false)
     private String status;
 
@@ -49,22 +42,6 @@ public class Request {
         this.client = client;
     }
 
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -87,5 +64,13 @@ public class Request {
 
     public void setCreationDate(LocalDate creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

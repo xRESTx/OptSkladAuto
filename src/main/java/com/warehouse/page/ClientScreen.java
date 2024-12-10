@@ -28,7 +28,7 @@ public class ClientScreen {
 
         JButton requestsButton = new JButton("Appeals");
         requestsButton.addActionListener(e -> {
-            RequestPage.showRequestPage(clientFullName);
+            RequestPage.showRequestPage(clientFullName, clientID);
         });
 
         JButton paymentsButton = new JButton("Payment");

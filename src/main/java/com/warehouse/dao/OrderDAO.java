@@ -29,6 +29,13 @@ public class OrderDAO {
             return session.get(Order.class, id);
         }
     }
+    public List<Order> findByClientId(int clientId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Order o WHERE o.client.id = :clientId", Order.class)
+                    .setParameter("clientId", clientId)
+                    .list();
+        }
+    }
 
     public List<Order> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
