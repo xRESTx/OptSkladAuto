@@ -9,16 +9,10 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import com.toedter.calendar.JDateChooser;
-import javax.swing.*;
-import java.awt.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class WarehouseApp {
 
     private AccountDAO accountDAO;
-
-    // Main window components
     private JFrame frame;
     private JTable accountTable;
     private DefaultTableModel tableModel;
