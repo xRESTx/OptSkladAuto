@@ -58,23 +58,34 @@ public class LoginScreen {
 
             AccountDAO accountDAO = new AccountDAO();
             Account account = accountDAO.findByUsername(username); // Поиск по имени пользователя
-            if (account != null && password.equals(account.getPassword())) {
+
+            if (account != null && password.equals(account.getPassword())) { // Убедиться, что пароли совпадают
                 JOptionPane.showMessageDialog(frame, "Login successful!");
                 frame.dispose(); // Закрываем окно входа
 
-                // Открываем экран для сотрудника
-                if (account.getRole().equalsIgnoreCase("employee")) {
-                    SwingUtilities.invokeLater(() -> EmployeeScreen.showEmployeeScreen(username));
-                } else if (account.getRole().equalsIgnoreCase("client")) {
-                    int clientID = ClientDAO.getClientIdByUsername(username);
-                    SwingUtilities.invokeLater(() -> ClientScreen.showClientScreen(username,clientID));
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Unknown role: " + account.getRole());
+                // Проверяем роль и открываем соответствующий экран
+                switch (account.getRole().toLowerCase()) {
+                    case "employee":
+                        SwingUtilities.invokeLater(() -> EmployeeScreen.showEmployeeScreen(username));
+                        break;
+                    case "client":
+                        int clientID = ClientDAO.getClientIdByUsername(username);
+                        SwingUtilities.invokeLater(() -> ClientScreen.showClientScreen(username, clientID));
+                        break;
+                    case "admin":
+                        SwingUtilities.invokeLater(() -> {
+                            AdminScreen.showAdminScreen(username);
+                        });
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(frame, "Unknown role: " + account.getRole());
+                        break;
                 }
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password.");
             }
         });
+
 
         JButton registerButton = new JButton("Register");
         registerButton.setBounds(150, 80, 120, 25);
@@ -237,7 +248,7 @@ public class LoginScreen {
         JTextField phoneField = new JTextField();
         JTextArea addressField = new JTextArea();
         JComboBox<Position> positionComboBox = new JComboBox<>();
-        JDateChooser startDateChooser = new JDateChooser();  // Используем только start_date
+        JDateChooser startDateChooser = new JDateChooser();
 
         // Загружаем позиции из базы данных
         PositionDAO positionDAO = new PositionDAO();
