@@ -53,54 +53,54 @@ public class AdminScreen {
             ContractsPage.showContractsPage();
         });
         buttonPanel.add(contractsButton);
-
-        JButton ordersButton = new JButton("Orders");
-        ordersButton.addActionListener(e -> {
-            OrdersPage.showOrdersPage();
-        });
-        buttonPanel.add(ordersButton);
-
-        JButton requestsButton = new JButton("Requests");
-        requestsButton.addActionListener(e -> {
-            RequestsPage.showRequestsPage();
-        });
-        buttonPanel.add(requestsButton);
-
-        JButton departmentsButton = new JButton("Departments");
-        departmentsButton.addActionListener(e -> {
-            DepartmentsPage.showDepartmentsPage();
-        });
-        buttonPanel.add(departmentsButton);
-
-        JButton productsButton = new JButton("Products");
-        productsButton.addActionListener(e -> {
-            ProductsPage.showProductsPage();
-        });
-        buttonPanel.add(productsButton);
-
-        JButton paymentsButton = new JButton("Payments");
-        paymentsButton.addActionListener(e -> {
-            PaymentsPage.showPaymentsPage();
-        });
-        buttonPanel.add(paymentsButton);
-
-        JButton orderItemsButton = new JButton("Order Items");
-        orderItemsButton.addActionListener(e -> {
-            OrderItemsPage.showOrderItemsPage();
-        });
-        buttonPanel.add(orderItemsButton);
-
-        JButton suppliersButton = new JButton("Suppliers");
-        suppliersButton.addActionListener(e -> {
-            SuppliersPage.showSuppliersPage();
-        });
-        buttonPanel.add(suppliersButton);
-
-        JButton suppliesButton = new JButton("Supplies");
-        suppliesButton.addActionListener(e -> {
-            SuppliesPage.showSuppliesPage();
-        });
-        buttonPanel.add(suppliesButton);
+//
+//        JButton ordersButton = new JButton("Orders");
+//        ordersButton.addActionListener(e -> {
+//            OrdersPage.showOrdersPage();
+//        });
+//        buttonPanel.add(ordersButton);
+//
+//        JButton requestsButton = new JButton("Requests");
+//        requestsButton.addActionListener(e -> {
+//            RequestsPage.showRequestsPage();
+//        });
+//        buttonPanel.add(requestsButton);
+//
+//        JButton departmentsButton = new JButton("Departments");
+//        departmentsButton.addActionListener(e -> {
+//            DepartmentsPage.showDepartmentsPage();
+//        });
+//        buttonPanel.add(departmentsButton);
+//
+//        JButton productsButton = new JButton("Products");
+//        productsButton.addActionListener(e -> {
+//            ProductsPage.showProductsPage();
+//        });
+//        buttonPanel.add(productsButton);
+//
+//        JButton paymentsButton = new JButton("Payments");
+//        paymentsButton.addActionListener(e -> {
+//            PaymentsPage.showPaymentsPage();
+//        });
+//        buttonPanel.add(paymentsButton);
+//
+//        JButton orderItemsButton = new JButton("Order Items");
+//        orderItemsButton.addActionListener(e -> {
+//            OrderItemsPage.showOrderItemsPage();
+//        });
+//        buttonPanel.add(orderItemsButton);
+//
+//        JButton suppliersButton = new JButton("Suppliers");
+//        suppliersButton.addActionListener(e -> {
+//            SuppliersPage.showSuppliersPage();
+//        });
+//        buttonPanel.add(suppliersButton);
+//
+//        JButton suppliesButton = new JButton("Supplies");
+//        suppliesButton.addActionListener(e -> {
+//            SuppliesPage.showSuppliesPage();
+//        });
+//        buttonPanel.add(suppliesButton);
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
 

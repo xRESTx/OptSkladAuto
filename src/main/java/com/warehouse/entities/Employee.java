@@ -101,4 +101,12 @@ public class Employee {
     public void setHireDate(LocalDate hireDate) {
         this.startDate = hireDate;
     }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
 }
