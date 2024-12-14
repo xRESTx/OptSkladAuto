@@ -23,7 +23,7 @@ public class LoginScreen {
             JPanel panel = new JPanel();
             frame.add(panel);
             placeComponents(panel, frame);
-
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }
@@ -78,7 +78,9 @@ public class LoginScreen {
                         });
                         break;
                     case "manager":
-
+                        SwingUtilities.invokeLater(() -> {
+                            ManagerScreen.showManagerScreen(username);
+                        });
                         break;
                     default:
                         JOptionPane.showMessageDialog(frame, "Unknown role: " + account.getRole());

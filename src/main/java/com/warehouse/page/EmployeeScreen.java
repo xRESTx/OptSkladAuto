@@ -20,66 +20,43 @@ public class EmployeeScreen {
 
         JLabel userLabel = new JLabel("Welcome, " + username + " (Employee)!");
         userLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        userLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Сделать текст крупнее
         mainPanel.add(userLabel, BorderLayout.NORTH);
 
         // Панель с действиями (кнопками)
         JPanel actionsPanel = new JPanel();
-        actionsPanel.setLayout(new BoxLayout(actionsPanel, BoxLayout.Y_AXIS));
+        actionsPanel.setLayout(new GridLayout(0, 1, 10, 10)); // Сетка для кнопок с вертикальными отступами
+        actionsPanel.setBackground(Color.LIGHT_GRAY); // Цвет фона панели действий
+        actionsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Отступы
 
         // Добавление кнопки для продуктов
-        JPanel productActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel productLabel = new JLabel("Manage Products:");
         JButton productButton = new JButton("Products");
-
-        productButton.setPreferredSize(new Dimension(100, 30));
-        productButton.setMinimumSize(new Dimension(100, 30));
-        productButton.setMaximumSize(new Dimension(100, 30));
-
+        productButton.setPreferredSize(new Dimension(200, 40)); // Фиксированный размер кнопки
+        productButton.setFont(new Font("Arial", Font.BOLD, 14));
         productButton.addActionListener(e -> {
             // Открытие нового окна для продуктов
             ProductScreen.showProductScreen(username);
         });
+        actionsPanel.add(productButton);
 
-        productActionPanel.add(productLabel);
-        productActionPanel.add(productButton);
-        actionsPanel.add(productActionPanel);
-
-        JPanel exampleActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel exampleLabel = new JLabel("Show orders:");
-        JButton exampleButton = new JButton("Orders");
-
-        exampleButton.setPreferredSize(new Dimension(100, 30));
-        exampleButton.setMinimumSize(new Dimension(100, 30));
-        exampleButton.setMaximumSize(new Dimension(100, 30));
-
-
-        exampleButton.addActionListener(e -> {
+        // Добавление кнопки для заказов
+        JButton orderButton = new JButton("Orders");
+        orderButton.setPreferredSize(new Dimension(200, 40)); // Фиксированный размер кнопки
+        orderButton.setFont(new Font("Arial", Font.BOLD, 14));
+        orderButton.addActionListener(e -> {
             // Открытие нового окна для заказов
             OrderScreen.showOrderScreen(username);
         });
-
-
-        exampleActionPanel.add(exampleLabel);
-        exampleActionPanel.add(exampleButton);
-        actionsPanel.add(exampleActionPanel);
+        actionsPanel.add(orderButton);
 
         // Кнопка для отображения списка сотрудников
-        JPanel employeeActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel employeeLabel = new JLabel("Show Employees:");
         JButton employeeButton = new JButton("Employees");
-
-        employeeButton.setPreferredSize(new Dimension(100, 30));
-        employeeButton.setMinimumSize(new Dimension(100, 30));
-        employeeButton.setMaximumSize(new Dimension(100, 30));
-
+        employeeButton.setPreferredSize(new Dimension(200, 40)); // Фиксированный размер кнопки
+        employeeButton.setFont(new Font("Arial", Font.BOLD, 14));
         employeeButton.addActionListener(e -> {
-            // Открытие нового окна для списка сотрудников
             showEmployeesList();
         });
-
-        employeeActionPanel.add(employeeLabel);
-        employeeActionPanel.add(employeeButton);
-        actionsPanel.add(employeeActionPanel);
+        actionsPanel.add(employeeButton);
 
         mainPanel.add(actionsPanel, BorderLayout.CENTER);
 
