@@ -48,6 +48,11 @@ public class ClientsPage {
         editButton.addActionListener(e -> editClient(clientTable, tableModel));
         buttonPanel.add(editButton);
 
+        // Кнопка удаления клиента
+        JButton deleteButton = new JButton("Delete Client");
+        deleteButton.addActionListener(e -> deleteClient(clientTable, tableModel));
+        buttonPanel.add(deleteButton);
+
         // Кнопка для закрытия окна
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> frame.dispose());
@@ -94,6 +99,7 @@ public class ClientsPage {
             factory.close();
         }
     }
+
     private static List<Account> getAvailableAccounts() {
         SessionFactory factory = new Configuration()
                 .configure("hibernate.cfg.xml")
@@ -114,6 +120,7 @@ public class ClientsPage {
             return availableAccounts;
         }
     }
+
     private static void addClient(DefaultTableModel tableModel) {
         // Получаем список всех аккаунтов, которых нет в таблицах Employees или Clients
         List<Account> availableAccounts = getAvailableAccounts();
@@ -204,6 +211,46 @@ public class ClientsPage {
         }
     }
 
+    private static void deleteClient(JTable clientTable, DefaultTableModel tableModel) {
+        int selectedRow = clientTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a client to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int clientId = (int) tableModel.getValueAt(selectedRow, 0);
+
+        // Запрос подтверждения удаления
+        int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this client?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            SessionFactory factory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(Client.class)
+                    .buildSessionFactory();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Client client = session.get(Client.class, clientId);
+                if (client != null) {
+                    session.delete(client);  // Удаление клиента из базы данных
+                    session.getTransaction().commit();
+
+                    // Удаляем клиента из таблицы
+                    tableModel.removeRow(selectedRow);
+
+                    JOptionPane.showMessageDialog(null, "Client deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Client not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error deleting client: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                factory.close();
+            }
+        }
+    }
 
     private static void editClient(JTable clientTable, DefaultTableModel tableModel) {
         int selectedRow = clientTable.getSelectedRow();
@@ -269,7 +316,7 @@ public class ClientsPage {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error updating client: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Error editing client: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } finally {
                 factory.close();
             }

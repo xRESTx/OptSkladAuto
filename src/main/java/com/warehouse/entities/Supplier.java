@@ -26,7 +26,17 @@ public class Supplier {
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+    public Supplier() {
+    }
 
+    // Другие конструкторы, геттеры и сеттеры
+    public Supplier(String name, String contactPhone, String email, String contactPerson, LocalDate startDate) {
+        this.name = name;
+        this.contactPhone = contactPhone;
+        this.email = email;
+        this.contactPerson = contactPerson;
+        this.startDate = startDate;
+    }
     // Getters, setters, constructors...
 
     public int getId() {
@@ -75,5 +85,9 @@ public class Supplier {
 
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
+    }
+    @Override
+    public String toString() {
+        return String.valueOf(id);
     }
 }

@@ -1,13 +1,16 @@
 package com.warehouse.page;
 import com.warehouse.page.adminPage.*;
+import com.warehouse.utils.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class AdminScreen {
-
     public static void showAdminScreen(String adminName) {
         JFrame frame = new JFrame("Admin Dashboard");
-        frame.setSize(600, 550);
+        frame.setSize(600, 650);  // Увеличено окно для удобства
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -19,92 +22,228 @@ public class AdminScreen {
         adminLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(adminLabel, BorderLayout.NORTH);
 
-        // Панель кнопок
+        // Панель кнопок с 2 столбцами
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(13, 1, 10, 10));
+        buttonPanel.setLayout(new GridLayout(7, 2, 10, 10)); // 7 строк и 2 столбца, с отступами между элементами
 
-        // Создаем кнопки для каждой таблицы
-        JButton accountButton = new JButton("Account");
-        accountButton.addActionListener(e -> {
-            AccountPage.showAccountPage();
-        });
-        buttonPanel.add(accountButton);
-
-        JButton clientsButton = new JButton("Clients");
-        clientsButton.addActionListener(e -> {
-            ClientsPage.showClientsPage();
-        });
-        buttonPanel.add(clientsButton);
-
-        JButton positionsButton = new JButton("Positions");
-        positionsButton.addActionListener(e -> {
-            PositionsPage.showPositionsPage();
-        });
-        buttonPanel.add(positionsButton);
-
-        JButton employeesButton = new JButton("Employees");
-        employeesButton.addActionListener(e -> {
-            EmployeesPage.showEmployeesPage();
-        });
-        buttonPanel.add(employeesButton);
-
-        JButton contractsButton = new JButton("Contracts");
-        contractsButton.addActionListener(e -> {
-            ContractsPage.showContractsPage();
-        });
-        buttonPanel.add(contractsButton);
-//
-//        JButton ordersButton = new JButton("Orders");
-//        ordersButton.addActionListener(e -> {
-//            OrdersPage.showOrdersPage();
-//        });
-//        buttonPanel.add(ordersButton);
-//
-//        JButton requestsButton = new JButton("Requests");
-//        requestsButton.addActionListener(e -> {
-//            RequestsPage.showRequestsPage();
-//        });
-//        buttonPanel.add(requestsButton);
-//
-//        JButton departmentsButton = new JButton("Departments");
-//        departmentsButton.addActionListener(e -> {
-//            DepartmentsPage.showDepartmentsPage();
-//        });
-//        buttonPanel.add(departmentsButton);
-//
-//        JButton productsButton = new JButton("Products");
-//        productsButton.addActionListener(e -> {
-//            ProductsPage.showProductsPage();
-//        });
-//        buttonPanel.add(productsButton);
-//
-//        JButton paymentsButton = new JButton("Payments");
-//        paymentsButton.addActionListener(e -> {
-//            PaymentsPage.showPaymentsPage();
-//        });
-//        buttonPanel.add(paymentsButton);
-//
-//        JButton orderItemsButton = new JButton("Order Items");
-//        orderItemsButton.addActionListener(e -> {
-//            OrderItemsPage.showOrderItemsPage();
-//        });
-//        buttonPanel.add(orderItemsButton);
-//
-//        JButton suppliersButton = new JButton("Suppliers");
-//        suppliersButton.addActionListener(e -> {
-//            SuppliersPage.showSuppliersPage();
-//        });
-//        buttonPanel.add(suppliersButton);
-//
-//        JButton suppliesButton = new JButton("Supplies");
-//        suppliesButton.addActionListener(e -> {
-//            SuppliesPage.showSuppliesPage();
-//        });
-//        buttonPanel.add(suppliesButton);
+        // Метод для создания кнопок с количеством элементов
+        addButtonWithLabel(buttonPanel, "Account", AccountPage::showAccountPage, getAccountCount());
+        addButtonWithLabel(buttonPanel, "Clients", ClientsPage::showClientsPage, getClientsCount());
+        addButtonWithLabel(buttonPanel, "Positions", PositionsPage::showPositionsPage, getPositionsCount());
+        addButtonWithLabel(buttonPanel, "Employees", EmployeesPage::showEmployeesPage, getEmployeesCount());
+        addButtonWithLabel(buttonPanel, "Contracts", ContractsPage::showContractsPage, getContractsCount());
+        addButtonWithLabel(buttonPanel, "Orders", OrdersPage::showOrdersPage, getOrdersCount());
+        addButtonWithLabel(buttonPanel, "Requests", RequestsPage::showRequestsPage, getRequestsCount());
+        addButtonWithLabel(buttonPanel, "Departments", DepartmentsPage::showDepartmentsPage, getDepartmentsCount());
+        addButtonWithLabel(buttonPanel, "Products", ProductsPage::showProductsPage, getProductsCount());
+        addButtonWithLabel(buttonPanel, "Payments", PaymentsPage::showPaymentsPage, getPaymentsCount());
+        addButtonWithLabel(buttonPanel, "Order Items", OrderItemsPage::showOrderItemsPage, getOrderItemsCount());
+        addButtonWithLabel(buttonPanel, "Suppliers", SuppliersPage::showSuppliersPage, getSuppliersCount());
+        addButtonWithLabel(buttonPanel, "Supplies", SuppliesPage::showSuppliesPage, getSuppliesCount());
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
 
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        frame.setLocationRelativeTo(null);  // Центрируем окно на экране
+        frame.setVisible(true);  // Делаем окно видимым
     }
+
+    private static void addButtonWithLabel(JPanel panel, String buttonText, Runnable action, int count) {
+        // Создаем кнопку с фиксированным размером
+        JButton button = new JButton(buttonText);
+        button.setPreferredSize(new Dimension(200, 50)); // Фиксированный размер кнопки
+        button.addActionListener(e -> action.run());
+
+        // Создаем метку для отображения количества элементов
+        JLabel label = new JLabel("Count: " + count);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Добавляем кнопку и метку в панель
+        panel.add(button);  // Добавляем кнопку
+        panel.add(label);   // Добавляем метку под кнопкой
+    }
+
+
+
+    // Пример методов для получения количества элементов из таблицы
+    private static int getAccountCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(a) FROM Account a";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getClientsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(c) FROM Client c";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getPositionsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(p) FROM Position p";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getEmployeesCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(e) FROM Employee e";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getContractsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(c) FROM Contract c";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getOrdersCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(o) FROM Order o";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getRequestsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(r) FROM Request r";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getDepartmentsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(d) FROM Department d";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getProductsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(p) FROM Product p";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getPaymentsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(p) FROM Payment p";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getOrderItemsCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(oi) FROM OrderItem oi";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getSuppliersCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(s) FROM Supplier s";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    private static int getSuppliesCount() {
+        // Создаем сессию Hibernate
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(s) FROM Delivery s";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            Long count = query.uniqueResult();
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 }

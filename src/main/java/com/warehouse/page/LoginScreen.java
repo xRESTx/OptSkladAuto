@@ -77,6 +77,9 @@ public class LoginScreen {
                             AdminScreen.showAdminScreen(username);
                         });
                         break;
+                    case "manager":
+
+                        break;
                     default:
                         JOptionPane.showMessageDialog(frame, "Unknown role: " + account.getRole());
                         break;
@@ -97,47 +100,6 @@ public class LoginScreen {
             showRegisterDialog(panel, frame); // Передаем панель и фрейм
         });
     }
-    private static void showLoginDialog(JFrame frame) {
-        JTextField usernameField = new JTextField(20);
-        JPasswordField passwordField = new JPasswordField(20);
-
-        JPanel panel = new JPanel(new GridLayout(0, 2));
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
-        panel.add(new JLabel("Password:"));
-        panel.add(passwordField);
-
-        int option = JOptionPane.showConfirmDialog(null, panel, "Login", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-
-            // Проверка логина
-            if (validateLogin(username, password)) {
-                JOptionPane.showMessageDialog(null, "Login Successful!");
-
-                // После успешного логина закрываем текущее окно
-                frame.dispose();
-
-                // Проверяем, является ли пользователь сотрудником или клиентом
-                AccountDAO accountDAO = new AccountDAO();
-                Account account = accountDAO.findByUsername(username);
-
-                if (account != null) {
-                    if (account.getRole().equals("employee")) {
-                        EmployeeScreen.showEmployeeScreen(username);
-                    } else if (account.getRole().equals("client")) {
-                        int clientID = ClientDAO.getClientIdByUsername(username);
-                        ClientScreen.showClientScreen(username,clientID);
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Invalid username or password.");
-            }
-        }
-    }
-
-
     private static boolean validateLogin(String username, String password) {
         AccountDAO accountDAO = new AccountDAO();
         Account account = accountDAO.findByUsername(username);
@@ -282,123 +244,5 @@ public class LoginScreen {
             employeeDAO.save(employee);
             JOptionPane.showMessageDialog(null, "Employee registration successful!");
         }
-    }
-
-    private static boolean registerUser() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(0, 2));
-
-        JTextField usernameField = new JTextField();
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
-
-        JPasswordField passwordField1 = new JPasswordField();
-        JPasswordField passwordField2 = new JPasswordField();
-        panel.add(new JLabel("Password:"));
-        panel.add(passwordField1);
-        panel.add(new JLabel("Confirm Password:"));
-        panel.add(passwordField2);
-
-        JButton clientButton = new JButton("Client");
-        JButton employeeButton = new JButton("Employee");
-        panel.add(clientButton);
-        panel.add(employeeButton);
-
-        JPanel additionalInfoPanel = new JPanel();
-        additionalInfoPanel.setLayout(new GridLayout(0, 2));
-
-        JTextField fullNameField = new JTextField();
-        JTextField phoneField = new JTextField();
-        JTextField emailField = new JTextField();
-        JTextArea addressField = new JTextArea();
-        additionalInfoPanel.add(new JLabel("Full Name:"));
-        additionalInfoPanel.add(fullNameField);
-        additionalInfoPanel.add(new JLabel("Phone:"));
-        additionalInfoPanel.add(phoneField);
-        additionalInfoPanel.add(new JLabel("Email:"));
-        additionalInfoPanel.add(emailField);
-        additionalInfoPanel.add(new JLabel("Address:"));
-        additionalInfoPanel.add(new JScrollPane(addressField));
-
-        JTextField employeeFullNameField = new JTextField();
-        JTextField employeePhoneField = new JTextField();
-        JTextArea employeeAddressField = new JTextArea();
-        JComboBox<Position> positionComboBox = new JComboBox<>();
-        JDateChooser startDateChooser = new JDateChooser();  // Заменили на startDateChooser
-        additionalInfoPanel.add(new JLabel("Employee Full Name:"));
-        additionalInfoPanel.add(employeeFullNameField);
-        additionalInfoPanel.add(new JLabel("Employee Phone:"));
-        additionalInfoPanel.add(employeePhoneField);
-        additionalInfoPanel.add(new JLabel("Employee Address:"));
-        additionalInfoPanel.add(new JScrollPane(employeeAddressField));
-        additionalInfoPanel.add(new JLabel("Position:"));
-        additionalInfoPanel.add(positionComboBox);
-        additionalInfoPanel.add(new JLabel("Start Date:"));
-        additionalInfoPanel.add(startDateChooser);
-
-        additionalInfoPanel.setVisible(false);
-        panel.add(additionalInfoPanel);
-
-        clientButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                additionalInfoPanel.setVisible(true);
-                employeeFullNameField.setText("");
-                employeePhoneField.setText("");
-                employeeAddressField.setText("");
-                positionComboBox.setVisible(false);
-                startDateChooser.setVisible(false);
-            }
-        });
-
-        employeeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                additionalInfoPanel.setVisible(true);
-                positionComboBox.setVisible(true);
-                startDateChooser.setVisible(true);
-
-                PositionDAO positionDAO = new PositionDAO();
-                List<Position> positions = positionDAO.findAll();
-                positionComboBox.setModel(new DefaultComboBoxModel<>(positions.toArray(new Position[0])));
-
-                fullNameField.setText("");
-                phoneField.setText("");
-                emailField.setText("");
-                addressField.setText("");
-            }
-        });
-
-        int option = JOptionPane.showConfirmDialog(null, panel, "User Registration", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String username = usernameField.getText();
-            String password1 = new String(passwordField1.getPassword());
-            String password2 = new String(passwordField2.getPassword());
-
-            if (!password1.equals(password2)) {
-                JOptionPane.showMessageDialog(null, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-
-            String selectedType = clientButton.getModel().isPressed() ? "Client" : "Employee";
-
-            AccountDAO accountDAO = new AccountDAO();
-            Account newAccount = new Account(username, password1, selectedType.toLowerCase(), LocalDate.now());
-            accountDAO.save(newAccount);
-
-            if ("Client".equals(selectedType)) {
-                Client client = new Client(fullNameField.getText(), phoneField.getText(), emailField.getText(), addressField.getText(), newAccount);
-                ClientDAO clientDAO = new ClientDAO();
-                clientDAO.save(client);
-            } else if ("Employee".equals(selectedType)) {
-                Position selectedPosition = (Position) positionComboBox.getSelectedItem();
-                LocalDate startDate = startDateChooser.getDate() != null ? new java.sql.Date(startDateChooser.getDate().getTime()).toLocalDate() : null;
-
-                Employee employee = new Employee(employeeFullNameField.getText(), employeePhoneField.getText(), employeeAddressField.getText(), startDate, selectedPosition, newAccount);
-                EmployeeDAO employeeDAO = new EmployeeDAO();
-                employeeDAO.save(employee);
-            }
-        }
-        return true;
     }
 }

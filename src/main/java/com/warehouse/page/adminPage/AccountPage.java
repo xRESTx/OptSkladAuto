@@ -10,7 +10,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
-
 public class AccountPage {
 
     public static void showAccountPage() {
@@ -46,6 +45,11 @@ public class AccountPage {
         JButton editButton = new JButton("Edit Account");
         editButton.addActionListener(e -> editAccount(accountTable, tableModel));
         buttonPanel.add(editButton);
+
+        // Кнопка удаления аккаунта
+        JButton deleteButton = new JButton("Delete Account");
+        deleteButton.addActionListener(e -> deleteAccount(accountTable, tableModel));
+        buttonPanel.add(deleteButton);
 
         // Кнопка для закрытия окна
         JButton closeButton = new JButton("Close");
@@ -156,18 +160,24 @@ public class AccountPage {
         String currentRole = (String) tableModel.getValueAt(selectedRow, 2);
 
         JTextField usernameField = new JTextField(currentUsername);
-        JTextField roleField = new JTextField(currentRole);
 
+        // Создаем JComboBox для выбора роли
+        String[] roles = {"admin", "manager", "employee", "client"};
+        JComboBox<String> roleComboBox = new JComboBox<>(roles);
+        roleComboBox.setSelectedItem(currentRole);  // Устанавливаем текущую роль
+
+        // Создаем панель с полями
         JPanel panel = new JPanel(new GridLayout(2, 2));
         panel.add(new JLabel("Username:"));
         panel.add(usernameField);
         panel.add(new JLabel("Role:"));
-        panel.add(roleField);
+        panel.add(roleComboBox);
 
+        // Окно подтверждения с редактированием
         int result = JOptionPane.showConfirmDialog(null, panel, "Edit Account", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String newUsername = usernameField.getText();
-            String newRole = roleField.getText();
+            String newRole = (String) roleComboBox.getSelectedItem();  // Получаем выбранную роль
 
             // Обновление аккаунта в базе данных
             SessionFactory factory = new Configuration()
@@ -197,6 +207,46 @@ public class AccountPage {
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Error updating account: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                factory.close();
+            }
+        }
+    }
+
+    private static void deleteAccount(JTable accountTable, DefaultTableModel tableModel) {
+        int selectedRow = accountTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select an account to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int accountId = (int) tableModel.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this account?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Удаление аккаунта из базы данных
+            SessionFactory factory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(Account.class)
+                    .buildSessionFactory();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Account account = session.get(Account.class, accountId);
+                if (account != null) {
+                    session.delete(account);
+                    session.getTransaction().commit();
+
+                    // Обновление таблицы
+                    tableModel.removeRow(selectedRow);
+
+                    JOptionPane.showMessageDialog(null, "Account deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Account not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error deleting account: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } finally {
                 factory.close();
             }

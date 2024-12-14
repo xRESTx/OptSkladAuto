@@ -1,5 +1,6 @@
 package com.warehouse.page.adminPage;
 
+import com.toedter.calendar.JDateChooser;
 import com.warehouse.entities.Employee;
 import com.warehouse.entities.Account;
 import com.warehouse.entities.Position;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,11 @@ public class EmployeesPage {
         JButton editButton = new JButton("Edit Employee");
         editButton.addActionListener(e -> editEmployee(employeeTable, tableModel));
         buttonPanel.add(editButton);
+
+        // Кнопка удаления сотрудника
+        JButton deleteButton = new JButton("Delete Employee");
+        deleteButton.addActionListener(e -> deleteEmployee(employeeTable, tableModel));
+        buttonPanel.add(deleteButton);
 
         // Кнопка для закрытия окна
         JButton closeButton = new JButton("Close");
@@ -108,11 +115,14 @@ public class EmployeesPage {
         JTextField fullNameField = new JTextField();
         JTextField phoneField = new JTextField();
         JTextField addressField = new JTextField();
-        JTextField startDateField = new JTextField();
 
         // Создаем комбобоксы для выбора аккаунта и должности
         JComboBox<String> accountComboBox = new JComboBox<>(availableAccountsName.toArray(new String[0]));
         JComboBox<Position> positionComboBox = new JComboBox<>(availablePositions.toArray(new Position[0]));
+
+        // Используем JDateChooser для выбора даты
+        JDateChooser startDateChooser = new JDateChooser();
+        startDateChooser.setDateFormatString("yyyy-MM-dd"); // Формат отображения даты
 
         JPanel panel = new JPanel(new GridLayout(6, 2));
         panel.add(new JLabel("Full Name:"));
@@ -121,8 +131,8 @@ public class EmployeesPage {
         panel.add(phoneField);
         panel.add(new JLabel("Address:"));
         panel.add(addressField);
-        panel.add(new JLabel("Start Date (YYYY-MM-DD):"));
-        panel.add(startDateField);
+        panel.add(new JLabel("Start Date:"));
+        panel.add(startDateChooser);
         panel.add(new JLabel("Account:"));
         panel.add(accountComboBox);
         panel.add(new JLabel("Position:"));
@@ -133,7 +143,6 @@ public class EmployeesPage {
             String fullName = fullNameField.getText();
             String phone = phoneField.getText();
             String address = addressField.getText();
-            String startDate = startDateField.getText();
 
             // Получаем выбранный аккаунт по имени
             String selectedUsername = (String) accountComboBox.getSelectedItem();
@@ -149,6 +158,14 @@ public class EmployeesPage {
                 return;
             }
 
+            // Получаем выбранную дату начала работы (если дата не выбрана, будет null)
+            java.util.Date startDateUtil = startDateChooser.getDate();
+            if (startDateUtil == null) {
+                JOptionPane.showMessageDialog(null, "Please select a valid start date.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            LocalDate startDate = startDateUtil.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
             // Настройка Hibernate
             try (SessionFactory factory = new Configuration()
                     .configure("hibernate.cfg.xml")
@@ -159,7 +176,7 @@ public class EmployeesPage {
                 session.beginTransaction();
 
                 // Создание нового сотрудника
-                Employee employee = new Employee(fullName, phone, address, LocalDate.parse(startDate), selectedPosition, selectedAccount);
+                Employee employee = new Employee(fullName, phone, address, startDate, selectedPosition, selectedAccount);
                 session.save(employee);
                 session.getTransaction().commit();
 
@@ -278,6 +295,44 @@ public class EmployeesPage {
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Error updating employee: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private static void deleteEmployee(JTable employeeTable, DefaultTableModel tableModel) {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select an employee to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int employeeId = (int) tableModel.getValueAt(selectedRow, 0);
+
+        int confirmation = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this employee?",
+                "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
+        if (confirmation == JOptionPane.YES_OPTION) {
+            SessionFactory factory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(Employee.class)
+                    .buildSessionFactory();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Employee employee = session.get(Employee.class, employeeId);
+                if (employee != null) {
+                    session.delete(employee);
+                    session.getTransaction().commit();
+
+                    // Удаление строки из таблицы
+                    tableModel.removeRow(selectedRow);
+
+                    JOptionPane.showMessageDialog(null, "Employee deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error deleting employee: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

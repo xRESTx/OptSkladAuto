@@ -4,11 +4,11 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "suppliers")
+@Table(name = "deliveries")
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "delivery_id")
+    @Column(name = "supply_id")
     private int id;
 
     @ManyToOne
@@ -19,13 +19,13 @@ public class Delivery {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "delivery_date", nullable = false)
+    @Column(name = "supply_date", nullable = false)
     private LocalDate deliveryDate;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "delivery_cost", nullable = false)
+    @Column(name = "supply_cost", nullable = false)
     private double deliveryCost;
 
     // Getters, setters, constructors...

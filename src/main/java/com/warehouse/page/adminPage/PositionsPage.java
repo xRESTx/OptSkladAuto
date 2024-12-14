@@ -46,6 +46,11 @@ public class PositionsPage {
         editButton.addActionListener(e -> editPosition(positionsTable, tableModel));
         buttonPanel.add(editButton);
 
+        // Кнопка удаления должности
+        JButton deleteButton = new JButton("Delete Position");
+        deleteButton.addActionListener(e -> deletePosition(positionsTable, tableModel));
+        buttonPanel.add(deleteButton);
+
         // Кнопка для закрытия окна
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> frame.dispose());
@@ -189,6 +194,47 @@ public class PositionsPage {
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Error updating position: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                factory.close();
+            }
+        }
+    }
+
+    private static void deletePosition(JTable positionsTable, DefaultTableModel tableModel) {
+        int selectedRow = positionsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select a position to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int positionId = (int) tableModel.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this position?", "Delete Position", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            SessionFactory factory = new Configuration()
+                    .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(Position.class)
+                    .buildSessionFactory();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Position position = session.get(Position.class, positionId);
+                if (position != null) {
+                    session.delete(position);
+
+                    session.getTransaction().commit();
+
+                    // Обновление таблицы
+                    tableModel.removeRow(selectedRow);
+
+                    JOptionPane.showMessageDialog(null, "Position deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Position not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error deleting position: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } finally {
                 factory.close();
             }

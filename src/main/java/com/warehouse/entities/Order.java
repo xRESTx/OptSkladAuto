@@ -65,4 +65,8 @@ public class Order {
     public void setOrderDate(LocalDate orderDate) {
         this.orderDate = orderDate;
     }
+    @Override
+    public String toString() {
+        return String.valueOf(id);
+    }
 }

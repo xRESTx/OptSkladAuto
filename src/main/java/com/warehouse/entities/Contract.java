@@ -15,13 +15,13 @@ public class Contract {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @Column(name = "contract_number", nullable = false)
+    @Column(name = "contract_number")
     private String contractNumber;
 
     @Column(name = "signing_date", nullable = false)
     private LocalDate signingDate;
 
-    @Column(name = "salary", nullable = false)
+    @Column(name = "salary")
     private int salary;
 
     // Getters, setters, constructors...
