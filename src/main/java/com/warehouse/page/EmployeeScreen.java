@@ -49,14 +49,14 @@ public class EmployeeScreen {
         });
         actionsPanel.add(orderButton);
 
-        // Кнопка для отображения списка сотрудников
-        JButton employeeButton = new JButton("Employees");
-        employeeButton.setPreferredSize(new Dimension(200, 40)); // Фиксированный размер кнопки
-        employeeButton.setFont(new Font("Arial", Font.BOLD, 14));
-        employeeButton.addActionListener(e -> {
-            showEmployeesList();
-        });
-        actionsPanel.add(employeeButton);
+//        // Кнопка для отображения списка сотрудников
+//        JButton employeeButton = new JButton("Employees");
+//        employeeButton.setPreferredSize(new Dimension(200, 40)); // Фиксированный размер кнопки
+//        employeeButton.setFont(new Font("Arial", Font.BOLD, 14));
+//        employeeButton.addActionListener(e -> {
+//            showEmployeesList();
+//        });
+//        actionsPanel.add(employeeButton);
 
         mainPanel.add(actionsPanel, BorderLayout.CENTER);
 

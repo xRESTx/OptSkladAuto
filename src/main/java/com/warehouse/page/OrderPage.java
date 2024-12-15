@@ -100,7 +100,6 @@ public class OrderPage {
             });
         }
 
-
         // Таблица для добавленных в заказ товаров
         DefaultTableModel orderItemsModel = new DefaultTableModel(
                 new String[]{"Product ID", "Product Name", "Quantity", "Price"}, 0
@@ -127,9 +126,7 @@ public class OrderPage {
             if (selectedRow != -1) {
                 int productId = (int) productsModel.getValueAt(selectedRow, 0);
                 String productName = (String) productsModel.getValueAt(selectedRow, 1);
-                Object stockQuantityObj = productsModel.getValueAt(selectedRow, 2);
-                int stockQuantity = (stockQuantityObj instanceof Number) ? ((Number) stockQuantityObj).intValue() : 0;
-
+                int stockQuantity = (int) productsModel.getValueAt(selectedRow, 3);
 
                 String quantityStr = JOptionPane.showInputDialog(frame, "Enter quantity (available: " + stockQuantity + "):");
                 if (quantityStr != null) {
@@ -194,7 +191,6 @@ public class OrderPage {
             newOrder.setAmount(totalAmount); // Устанавливаем общую стоимость
             orderDAO.update(newOrder); // Обновляем заказ в базе данных
 
-
             if (allItemsAdded) {
                 JOptionPane.showMessageDialog(frame, "Order successfully created!");
                 // Обновляем таблицу заказов на главной странице
@@ -210,6 +206,7 @@ public class OrderPage {
 
         frame.setVisible(true);
     }
+
 
 
     private static void showOrderDetails(Order order) {
