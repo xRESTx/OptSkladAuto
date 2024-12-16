@@ -1,4 +1,6 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
+
+import com.warehouse.ui.adminPages.categoryPages.CategoryPage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +10,7 @@ public class AdminMainPage {
     public AdminMainPage() {
         // Создаем главное окно
         JFrame frame = new JFrame("Главная страница");
-        frame.setSize(1200, 800);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Центр экрана
 

@@ -1,27 +1,25 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages.categoryPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import com.warehouse.dao.RepairDAO;
-import com.warehouse.models.Repair;
+import com.warehouse.dao.ElectronicsDAO;
+import com.warehouse.models.Electronics;
 
-import static java.lang.Integer.parseInt;
-
-public class RepairPage extends JFrame {
+public class ElectronicsPage extends JFrame {
     private JTable categoryTable;
     private JButton backButton, saveButton;
     private DefaultTableModel tableModel;
 
-    public RepairPage() {
-        setTitle("Edit Repair Category");
-        setSize(1400, 800);
+    public ElectronicsPage() {
+        setTitle("Edit Electronics Category");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Названия столбцов для категории Repair
-        String[] columnNames = {"Articul","Name", "Subcategory", "Vendor", "Weight", "Size", "OEM", "Material", "Compatibility"};
+        // Названия столбцов для категории Electronics
+        String[] columnNames = {"Articul", "Name", "Subcategory", "Vendor", "Supported", "Warranty", "Permission", "Connect", "Screen"};
 
         // Создаем таблицу
         tableModel = new DefaultTableModel(null, columnNames) {
@@ -57,19 +55,19 @@ public class RepairPage extends JFrame {
 
     // Метод для загрузки данных категории
     private void loadCategoryData() {
-        List<Repair> categoryData = RepairDAO.findAll();
+        List<Electronics> categoryData = ElectronicsDAO.findAll();
         tableModel.setRowCount(0); // Очищаем таблицу
-        for (Repair repair : categoryData) {
+        for (Electronics electronics : categoryData) {
             tableModel.addRow(new Object[]{
-                    repair.getArticul(),
-                    repair.getAutotovar().getName(),
-                    repair.getSubcategory(),
-                    repair.getVendor(),
-                    repair.getWeight(),
-                    repair.getSize(),
-                    repair.getOem(),
-                    repair.getMaterial(),
-                    repair.getCompatibility()
+                    electronics.getArticul(),
+                    electronics.getAutotovar().getName(),
+                    electronics.getSubcategory(),
+                    electronics.getVendor(),
+                    electronics.getSupported(),
+                    electronics.getWarranty(),
+                    electronics.getPermission(),
+                    electronics.getConnect(),
+                    electronics.getScreen()
             });
         }
     }
@@ -77,23 +75,24 @@ public class RepairPage extends JFrame {
     // Метод для сохранения изменений
     private void saveChanges() {
         int rowCount = tableModel.getRowCount();
+        int columnCount = tableModel.getColumnCount();
 
         for (int i = 0; i < rowCount; i++) {
             int articul = (int) tableModel.getValueAt(i, 0); // articul
 
-            // Создаем новый объект Repair с обновленными данными
-            Repair updatedRepair = new Repair();
-            updatedRepair.setArticul(articul);
-            updatedRepair.setSubcategory((String) tableModel.getValueAt(i, 1));
-            updatedRepair.setVendor((String) tableModel.getValueAt(i, 2));
-            updatedRepair.setWeight((String) tableModel.getValueAt(i, 3));
-            updatedRepair.setSize((String) tableModel.getValueAt(i, 4));
-            updatedRepair.setOem(parseInt((String) tableModel.getValueAt(i, 5)));
-            updatedRepair.setMaterial((String) tableModel.getValueAt(i, 6));
-            updatedRepair.setCompatibility((String) tableModel.getValueAt(i, 7));
+            // Создаем новый объект Electronics с обновленными данными
+            Electronics updatedElectronics = new Electronics();
+            updatedElectronics.setArticul(articul);
+            updatedElectronics.setSubcategory((String) tableModel.getValueAt(i, 1));
+            updatedElectronics.setVendor((String) tableModel.getValueAt(i, 2));
+            updatedElectronics.setSupported((String) tableModel.getValueAt(i, 3));
+            updatedElectronics.setWarranty((String) tableModel.getValueAt(i, 4));
+            updatedElectronics.setPermission((String) tableModel.getValueAt(i, 5));
+            updatedElectronics.setConnect((String) tableModel.getValueAt(i, 6));
+            updatedElectronics.setScreen((String) tableModel.getValueAt(i, 7));
 
             // Обновляем данные через DAO
-            RepairDAO.updateRow(articul, updatedRepair);
+            ElectronicsDAO.updateRow(articul, updatedElectronics);
         }
 
         JOptionPane.showMessageDialog(this, "Changes saved successfully!");

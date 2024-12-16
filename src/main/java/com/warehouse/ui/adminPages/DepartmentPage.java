@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
 
 import com.warehouse.dao.DepartmentDAO;
 import com.warehouse.models.Department;
@@ -13,11 +13,11 @@ public class DepartmentPage extends JFrame {
 
     private JTable departmentTable;
     private DefaultTableModel tableModel;
-    private JButton addButton, editButton, deleteButton, backButton;
+    private JButton addButton, editButton, backButton;
 
     public DepartmentPage() {
         setTitle("Department Management");
-        setSize(800, 600);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -36,11 +36,9 @@ public class DepartmentPage extends JFrame {
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addButton = new JButton("Add Department");
         editButton = new JButton("Edit Department");
-        deleteButton = new JButton("Delete Department");
         backButton = new JButton("Back");
         toolbar.add(addButton);
         toolbar.add(editButton);
-        toolbar.add(deleteButton);
         toolbar.add(backButton);
 
         // Добавляем таблицу и кнопки
@@ -50,7 +48,6 @@ public class DepartmentPage extends JFrame {
         // Логика кнопок
         addButton.addActionListener(e -> addDepartment());
         editButton.addActionListener(e -> editDepartment());
-        deleteButton.addActionListener(e -> deleteDepartment());
         backButton.addActionListener(e -> {
             dispose(); // Закрываем текущее окно
             new AdminMainPage(); // Возвращаемся на главную страницу

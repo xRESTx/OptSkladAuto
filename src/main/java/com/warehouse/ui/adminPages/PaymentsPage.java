@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,7 +17,7 @@ public class PaymentsPage extends JFrame {
 
     public PaymentsPage() {
         setTitle("Payments Management");
-        setSize(1400, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

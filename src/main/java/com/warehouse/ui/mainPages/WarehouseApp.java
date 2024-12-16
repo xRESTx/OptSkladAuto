@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.mainPages;
 
 public class WarehouseApp {
 

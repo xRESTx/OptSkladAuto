@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +23,7 @@ public class OrdersPage extends JFrame {
 
     public OrdersPage() {
         setTitle("Orders Management");
-        setSize(1200, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

@@ -1,37 +1,32 @@
-package com.warehouse.ui;
+package com.warehouse.ui.userPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import com.warehouse.dao.OrderDAO;
 import com.warehouse.dao.PaymentDAO;
-import com.warehouse.models.Order;
 import com.warehouse.models.Payment;
-import com.warehouse.models.Request;
 import com.warehouse.ui.dialog.AddPaymentDialog;
 import com.warehouse.ui.dialog.EditPaymentDialog;
+import com.warehouse.ui.dialog.UserAddPaymentDialog;
 import com.warehouse.utils.SessionManager;
 
 public class UserPaymentsPage extends JFrame {
     private JTable paymentsTable;
-    private JButton backButton, addButton, editButton, deleteButton, filterButton;
+    private JButton backButton, addButton, deleteButton;
     private JTextField searchField;
 
     public UserPaymentsPage() {
         setTitle("Payments Management");
-        setSize(1400, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // Панель инструментов
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchField = new JTextField(20);
-        filterButton = new JButton("Filter/Search");
         addButton = new JButton("Add Payment");
-        editButton = new JButton("Edit Payment");
         deleteButton = new JButton("Delete Payment");
         backButton = new JButton("Назад");
 
@@ -59,9 +54,7 @@ public class UserPaymentsPage extends JFrame {
         toolbar.add(backButton);
         toolbar.add(new JLabel("Search:"));
         toolbar.add(searchField);
-        toolbar.add(filterButton);
         toolbar.add(addButton);
-        toolbar.add(editButton);
         toolbar.add(deleteButton);
 //        toolbar.add(new JLabel("Sort by:"));
 //        toolbar.add(sortColumnBox);
@@ -82,20 +75,12 @@ public class UserPaymentsPage extends JFrame {
 
         // Слушатели действий
         addButton.addActionListener(e -> {
-            new AddPaymentDialog(UserPaymentsPage.this).setVisible(true);
+            new UserAddPaymentDialog(UserPaymentsPage.this).setVisible(true);
             loadPayments();
-        });
-
-        editButton.addActionListener(e -> {
-            editPayment();
         });
 
         deleteButton.addActionListener(e -> {
             deletePayment();
-        });
-
-        filterButton.addActionListener(e -> {
-            filterPayments();
         });
 
 //        sortButton.addActionListener(e -> {

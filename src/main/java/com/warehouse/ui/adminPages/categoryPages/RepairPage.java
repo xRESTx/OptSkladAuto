@@ -1,25 +1,27 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages.categoryPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import com.warehouse.dao.WheelsDAO;
-import com.warehouse.models.Wheels;
+import com.warehouse.dao.RepairDAO;
+import com.warehouse.models.Repair;
 
-public class WheelsPage extends JFrame {
+import static java.lang.Integer.parseInt;
+
+public class RepairPage extends JFrame {
     private JTable categoryTable;
     private JButton backButton, saveButton;
     private DefaultTableModel tableModel;
 
-    public WheelsPage() {
-        setTitle("Edit Wheels Category");
-        setSize(1400, 800);
+    public RepairPage() {
+        setTitle("Edit Repair Category");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Названия столбцов для категории Wheels
-        String[] columnNames = {"Articul", "Name", "Subcategory", "Vendor", "Size", "Protector", "Material", "Colour", "Seasonality"};
+        // Названия столбцов для категории Repair
+        String[] columnNames = {"Articul","Name", "Subcategory", "Vendor", "Weight", "Size", "OEM", "Material", "Compatibility"};
 
         // Создаем таблицу
         tableModel = new DefaultTableModel(null, columnNames) {
@@ -55,19 +57,19 @@ public class WheelsPage extends JFrame {
 
     // Метод для загрузки данных категории
     private void loadCategoryData() {
-        List<Wheels> categoryData = WheelsDAO.findAll();
+        List<Repair> categoryData = RepairDAO.findAll();
         tableModel.setRowCount(0); // Очищаем таблицу
-        for (Wheels wheels : categoryData) {
+        for (Repair repair : categoryData) {
             tableModel.addRow(new Object[]{
-                    wheels.getArticul(),
-                    wheels.getAutotovar().getName(),
-                    wheels.getSubcategory(),
-                    wheels.getVendor(),
-                    wheels.getSize(),
-                    wheels.getProtector(),
-                    wheels.getMaterial(),
-                    wheels.getColour(),
-                    wheels.getSeasonality()
+                    repair.getArticul(),
+                    repair.getAutotovar().getName(),
+                    repair.getSubcategory(),
+                    repair.getVendor(),
+                    repair.getWeight(),
+                    repair.getSize(),
+                    repair.getOem(),
+                    repair.getMaterial(),
+                    repair.getCompatibility()
             });
         }
     }
@@ -75,24 +77,23 @@ public class WheelsPage extends JFrame {
     // Метод для сохранения изменений
     private void saveChanges() {
         int rowCount = tableModel.getRowCount();
-        int columnCount = tableModel.getColumnCount();
 
         for (int i = 0; i < rowCount; i++) {
             int articul = (int) tableModel.getValueAt(i, 0); // articul
 
-            // Создаем новый объект Wheels с обновленными данными
-            Wheels updatedWheels = new Wheels();
-            updatedWheels.setArticul(articul);
-            updatedWheels.setSubcategory((String) tableModel.getValueAt(i, 1));
-            updatedWheels.setVendor((String) tableModel.getValueAt(i, 2));
-            updatedWheels.setSize((String) tableModel.getValueAt(i, 3));
-            updatedWheels.setProtector((String) tableModel.getValueAt(i, 4));
-            updatedWheels.setMaterial((String) tableModel.getValueAt(i, 5));
-            updatedWheels.setColour((String) tableModel.getValueAt(i, 6));
-            updatedWheels.setSeasonality((String) tableModel.getValueAt(i, 7));
+            // Создаем новый объект Repair с обновленными данными
+            Repair updatedRepair = new Repair();
+            updatedRepair.setArticul(articul);
+            updatedRepair.setSubcategory((String) tableModel.getValueAt(i, 1));
+            updatedRepair.setVendor((String) tableModel.getValueAt(i, 2));
+            updatedRepair.setWeight((String) tableModel.getValueAt(i, 3));
+            updatedRepair.setSize((String) tableModel.getValueAt(i, 4));
+            updatedRepair.setOem(parseInt((String) tableModel.getValueAt(i, 5)));
+            updatedRepair.setMaterial((String) tableModel.getValueAt(i, 6));
+            updatedRepair.setCompatibility((String) tableModel.getValueAt(i, 7));
 
             // Обновляем данные через DAO
-            WheelsDAO.updateRow(articul, updatedWheels);
+            RepairDAO.updateRow(articul, updatedRepair);
         }
 
         JOptionPane.showMessageDialog(this, "Changes saved successfully!");

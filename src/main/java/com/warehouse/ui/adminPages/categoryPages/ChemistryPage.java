@@ -1,25 +1,25 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages.categoryPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import com.warehouse.dao.AccessoriesDAO;
-import com.warehouse.models.Accessories;
+import com.warehouse.dao.ChemistryDAO;
+import com.warehouse.models.Chemistry;
 
-public class AccessoriesPage extends JFrame {
+public class ChemistryPage extends JFrame {
     private JTable categoryTable;
     private JButton backButton, saveButton;
     private DefaultTableModel tableModel;
 
-    public AccessoriesPage() {
-        setTitle("Edit Accessories Category");
-        setSize(1400, 800);
+    public ChemistryPage() {
+        setTitle("Edit Chemistry Category");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Названия столбцов для категории Accessories
-        String[] columnNames = {"Articul", "Name", "Subcategory", "Vendor", "Material", "Colour", "Size", "Features", "Appointment"};
+        // Названия столбцов для категории Chemistry
+        String[] columnNames = {"Articul", "Name", "Subcategory", "Vendor", "Composition", "Concentration", "Target", "Volume", "Expiration Date"};
 
         // Создаем таблицу
         tableModel = new DefaultTableModel(null, columnNames) {
@@ -39,6 +39,7 @@ public class AccessoriesPage extends JFrame {
         backButton = new JButton("Back");
         saveButton = new JButton("Save Changes");
 
+
         saveButton.addActionListener(e -> saveChanges());
         backButton.addActionListener(e -> {
             dispose();
@@ -48,6 +49,7 @@ public class AccessoriesPage extends JFrame {
         toolbar.add(backButton);
         toolbar.add(saveButton);
 
+
         // Добавляем компоненты в окно
         add(scrollPane, BorderLayout.CENTER);
         add(toolbar, BorderLayout.NORTH);
@@ -55,19 +57,19 @@ public class AccessoriesPage extends JFrame {
 
     // Метод для загрузки данных категории
     private void loadCategoryData() {
-        List<Accessories> categoryData = AccessoriesDAO.findAll();
+        List<Chemistry> categoryData = ChemistryDAO.findAll();
         tableModel.setRowCount(0); // Очищаем таблицу
-        for (Accessories accessories : categoryData) {
+        for (Chemistry chemistry : categoryData) {
             tableModel.addRow(new Object[]{
-                    accessories.getArticul(),
-                    accessories.getAutotovar().getName(),
-                    accessories.getSubcategory(),
-                    accessories.getVendor(),
-                    accessories.getMaterial(),
-                    accessories.getColour(),
-                    accessories.getSize(),
-                    accessories.getFeatures(),
-                    accessories.getAppointment()
+                    chemistry.getArticul(),
+                    chemistry.getAutotovar().getName(),
+                    chemistry.getSubcategory(),
+                    chemistry.getVendor(),
+                    chemistry.getCompositions(),
+                    chemistry.getConcentration(),
+                    chemistry.getTarget(),
+                    chemistry.getVolume(),
+                    chemistry.getExpirationDate()
             });
         }
     }
@@ -75,23 +77,24 @@ public class AccessoriesPage extends JFrame {
     // Метод для сохранения изменений
     private void saveChanges() {
         int rowCount = tableModel.getRowCount();
+        int columnCount = tableModel.getColumnCount();
 
         for (int i = 0; i < rowCount; i++) {
             int articul = (int) tableModel.getValueAt(i, 0); // articul
 
-            // Создаем новый объект Accessories с обновленными данными
-            Accessories updatedAccessories = new Accessories();
-            updatedAccessories.setArticul(articul);
-            updatedAccessories.setSubcategory((String) tableModel.getValueAt(i, 1));
-            updatedAccessories.setVendor((String) tableModel.getValueAt(i, 2));
-            updatedAccessories.setMaterial((String) tableModel.getValueAt(i, 3));
-            updatedAccessories.setColour((String) tableModel.getValueAt(i, 4));
-            updatedAccessories.setSize((String) tableModel.getValueAt(i, 5));
-            updatedAccessories.setFeatures((String) tableModel.getValueAt(i, 6));
-            updatedAccessories.setAppointment((String) tableModel.getValueAt(i, 7));
+            // Создаем новый объект Chemistry с обновленными данными
+            Chemistry updatedChemistry = new Chemistry();
+            updatedChemistry.setArticul(articul);
+            updatedChemistry.setSubcategory((String) tableModel.getValueAt(i, 1));
+            updatedChemistry.setVendor((String) tableModel.getValueAt(i, 2));
+            updatedChemistry.setCompositions((String) tableModel.getValueAt(i, 3));
+            updatedChemistry.setConcentration((String) tableModel.getValueAt(i, 4));
+            updatedChemistry.setTarget((String) tableModel.getValueAt(i, 5));
+            updatedChemistry.setVolume((String) tableModel.getValueAt(i, 6));
+            updatedChemistry.setExpirationDate((String) tableModel.getValueAt(i, 7));
 
             // Обновляем данные через DAO
-            AccessoriesDAO.updateRow(articul, updatedAccessories);
+            ChemistryDAO.updateRow(articul, updatedChemistry);
         }
 
         JOptionPane.showMessageDialog(this, "Changes saved successfully!");

@@ -1,8 +1,9 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages.categoryPages;
+
+import com.warehouse.ui.adminPages.AdminMainPage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class CategoryPage extends JFrame {
     private JButton chemistryButton;
@@ -15,7 +16,7 @@ public class CategoryPage extends JFrame {
 
     public CategoryPage() {
         setTitle("Categories");
-        setSize(400, 400);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

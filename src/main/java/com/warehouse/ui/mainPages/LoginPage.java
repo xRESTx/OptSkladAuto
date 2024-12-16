@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.mainPages;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +9,8 @@ import com.warehouse.dao.AccountDAO;
 import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.models.Account;
 import com.warehouse.models.Employee;
+import com.warehouse.ui.adminPages.AdminMainPage;
+import com.warehouse.ui.userPages.UserMainPage;
 import com.warehouse.utils.*;
 
 

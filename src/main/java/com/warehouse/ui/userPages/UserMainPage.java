@@ -1,7 +1,6 @@
-package com.warehouse.ui;
+package com.warehouse.ui.userPages;
 
 import javax.swing.*;
-import javax.validation.constraints.Null;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,7 @@ import com.warehouse.models.Account;
 import com.warehouse.models.Autotovar;
 import com.warehouse.models.Order;
 import com.warehouse.models.OrderComponent;
+import com.warehouse.ui.mainPages.LoginPage;
 import com.warehouse.ui.dialog.ProductDetailsDialog;
 import com.warehouse.utils.*;
 
@@ -26,7 +26,7 @@ public class UserMainPage extends JFrame {
 
     public UserMainPage() {
         setTitle("User Dashboard");
-        setSize(1400, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -137,7 +137,8 @@ public class UserMainPage extends JFrame {
             cardPanel.setPreferredSize(new Dimension(300, 120));
 
             // Путь к фотографии
-            String photoPath = "C:\\Users\\REST\\IdeaProjects\\OptSkladAuto\\src\\main\\resources\\photo\\" + autotovar.getArticul() + ".jpg";
+            String photoPath = "src/main/resources/photo/" + autotovar.getArticul() + ".jpg";
+            String noImagePath = "src/main/resources/photo/noImagePhoto.jpg";
 
             // Создаем компонент для фото
             JLabel photoLabel = new JLabel();
@@ -153,8 +154,9 @@ public class UserMainPage extends JFrame {
                     throw new Exception("Image not found or invalid");
                 }
             } catch (Exception e) {
-                photoLabel.setText("No Image");
-                photoLabel.setPreferredSize(new Dimension(100, 100)); // Устанавливаем фиксированный размер
+                ImageIcon imageIcon = new ImageIcon(noImagePath);
+                Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING);
+                photoLabel.setIcon(new ImageIcon(image));
             }
 
             // Добавляем фото в левую часть карточки
@@ -183,7 +185,7 @@ public class UserMainPage extends JFrame {
 
             // Резервируем место для кнопки или управления количеством
             JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            actionPanel.setMaximumSize(new Dimension(200, 50)); // Фиксируем высоту панели
+            actionPanel.setMaximumSize(new Dimension(250, 50)); // Фиксируем высоту панели
             actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             infoPanel.add(actionPanel);
 

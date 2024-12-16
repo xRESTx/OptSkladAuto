@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.userPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,7 +13,6 @@ import com.warehouse.dao.OrderComponentDAO;
 import com.warehouse.dao.OrderDAO;
 import com.warehouse.models.Order;
 import com.warehouse.models.OrderComponent;
-import com.warehouse.ui.dialog.EditOrderDialog;
 import com.warehouse.ui.dialog.OrderDetailsDialog;
 import com.warehouse.ui.dialog.UserEditOrderDialog;
 import com.warehouse.utils.SessionManager;
@@ -25,7 +24,7 @@ public class UserOrdersPage extends JFrame {
 
     public UserOrdersPage() {
         setTitle("Orders Management");
-        setSize(1200, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

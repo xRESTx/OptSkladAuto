@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages.categoryPages;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,7 +14,7 @@ public class LubricantsPage extends JFrame {
 
     public LubricantsPage() {
         setTitle("Edit Lubricants Category");
-        setSize(1400, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

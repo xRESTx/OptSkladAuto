@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
 
 import com.warehouse.dao.RequestDAO;
 import com.warehouse.models.Request;
@@ -7,8 +7,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class RequestsPage extends JFrame {
@@ -18,7 +16,7 @@ public class RequestsPage extends JFrame {
 
     public RequestsPage() {
         setTitle("Requests Management");
-        setSize(1200, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

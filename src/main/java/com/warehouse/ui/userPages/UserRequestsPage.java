@@ -1,8 +1,6 @@
-package com.warehouse.ui;
+package com.warehouse.ui.userPages;
 
-import com.warehouse.dao.OrderDAO;
 import com.warehouse.dao.RequestDAO;
-import com.warehouse.models.Order;
 import com.warehouse.models.Request;
 import com.warehouse.utils.SessionManager;
 
@@ -10,8 +8,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +17,7 @@ public class UserRequestsPage extends JFrame {
 
     public UserRequestsPage() {
         setTitle("Requests Management");
-        setSize(1200, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

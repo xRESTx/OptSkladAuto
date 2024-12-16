@@ -1,4 +1,4 @@
-package com.warehouse.ui;
+package com.warehouse.ui.adminPages;
 
 import com.warehouse.dao.ContractDAO;
 import com.warehouse.models.Contract;

@@ -33,7 +33,8 @@ public class ProductDetailsDialog extends JDialog {
         photoPanel.setPreferredSize(new Dimension(150, 150));
         photoPanel.setBackground(Color.LIGHT_GRAY); // Устанавливаем фон
         photoPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        String photoPath = "C:\\Users\\REST\\IdeaProjects\\OptSkladAuto\\src\\main\\resources\\photo\\" + autotovar.getArticul() + ".jpg";
+        String photoPath = "src/main/resources/photo/" + autotovar.getArticul() + ".jpg";
+        String noImagePath = "src/main/resources/photo/noImagePhoto.jpg";
         JLabel photoLabel = new JLabel();
         photoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -46,7 +47,9 @@ public class ProductDetailsDialog extends JDialog {
                 throw new Exception("Image not found or invalid");
             }
         } catch (Exception e) {
-            photoLabel.setText("No Image");
+            ImageIcon imageIcon = new ImageIcon(noImagePath);
+            Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING);
+            photoLabel.setIcon(new ImageIcon(image));
         }
 
         photoPanel.add(photoLabel);
