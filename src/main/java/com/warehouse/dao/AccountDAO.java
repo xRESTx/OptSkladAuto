@@ -82,4 +82,49 @@ public class AccountDAO {
 
         return account;
     }
+
+    public boolean createAccount(Account account) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Начинаем транзакцию
+            transaction = session.beginTransaction();
+
+            // Сохраняем объект Account в базу данных
+            session.save(account);
+
+            // Подтверждаем транзакцию
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback(); // Откат транзакции в случае ошибки
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Проверка по телефону
+    public Account getAccountByPhone(String phone) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Account WHERE phone = :phone", Account.class)
+                    .setParameter("phone", phone)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Проверка по e-mail
+    public Account getAccountByEmail(String email) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Account WHERE email = :email", Account.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

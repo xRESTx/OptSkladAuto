@@ -52,7 +52,7 @@ public class EmployeeDAO {
         }
     }
 
-    public Employee getEmployeeByLogin(String login) {
+    public static Employee getEmployeeByLogin(String login) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
 
@@ -150,6 +150,15 @@ public class EmployeeDAO {
                 transaction.rollback();
             }
             throw new RuntimeException("Error adding employee with contract: " + e.getMessage(), e);
+        }
+    }
+    public static String[] getAllEmployeeLogins() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<String> logins = session.createQuery("SELECT e.employeeLogin FROM Employee e", String.class).getResultList();
+            return logins.toArray(new String[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch employee logins.");
         }
     }
 

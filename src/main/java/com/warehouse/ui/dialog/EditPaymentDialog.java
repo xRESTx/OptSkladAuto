@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 public class EditPaymentDialog extends JDialog {
-    private JTextField paymentIdField;
+    private JTextField paymentIdField, orderField;
     private JComboBox<Order> orderComboBox;
     private JDateChooser datePaymentChooser;
     private JTextField statusPaymentField;
@@ -43,10 +43,15 @@ public class EditPaymentDialog extends JDialog {
 
         // Заказ
         formPanel.add(new JLabel("Order:"));
-        orderComboBox = new JComboBox<>();
-        loadOrders();  // Загружаем заказы в ComboBox
-        orderComboBox.setSelectedItem(payment.getOrders());  // Устанавливаем текущий заказ
-        formPanel.add(orderComboBox);
+        orderField = new JTextField();
+        formPanel.add(orderField);
+        int orderId = payment.getOrders().getNumberOrder(); // Получаем ID заказа из объекта Payment
+        loadOrderDetails(orderField, orderId);
+        orderField.setEditable(false);
+//        orderComboBox = new JComboBox<>();
+//        loadOrders();  // Загружаем заказы в ComboBox
+//        orderComboBox.setSelectedItem(payment.getOrders());  // Устанавливаем текущий заказ
+//        formPanel.add(orderField);
 
         // Дата платежа
         formPanel.add(new JLabel("Date Payment:"));
@@ -85,6 +90,21 @@ public class EditPaymentDialog extends JDialog {
                 dispose();  // Закрыть окно без сохранения
             }
         });
+    }
+
+    private void loadOrderDetails(JTextField orderField, int orderId) {
+        // Загружаем заказ из базы данных по его ID
+        Order order = OrderDAO.findOrderById(orderId);
+
+        // Если заказ найден, устанавливаем его данные в текстовое поле
+        if (order != null) {
+            orderField.setText("Order # " + order.getNumberOrder());
+        } else {
+            orderField.setText("Order not found");
+        }
+
+        // Делаем поле только для чтения
+        orderField.setEditable(false);
     }
 
     // Загрузка всех заказов для ComboBox

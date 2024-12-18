@@ -2,6 +2,7 @@ package com.warehouse.ui.adminPages;
 
 import com.warehouse.dao.RequestDAO;
 import com.warehouse.models.Request;
+import com.warehouse.ui.dialog.EditRequestDialog;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,7 @@ public class RequestsPage extends JFrame {
     private JTable requestsTable;
     private JButton backButton;
     private JButton deleteButton;
+    private JButton editButton;
 
     public RequestsPage() {
         setTitle("Requests Management");
@@ -23,6 +25,7 @@ public class RequestsPage extends JFrame {
         // Панель инструментов
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         backButton = new JButton("Назад");
+        editButton = new JButton("Edit");
         deleteButton = new JButton("Delete");
 
         // Кнопка "Назад"
@@ -33,6 +36,7 @@ public class RequestsPage extends JFrame {
 
         // Добавляем кнопки на панель инструментов
         toolbar.add(backButton);
+        toolbar.add(editButton);
         toolbar.add(deleteButton);
 
         // Таблица запросов
@@ -55,7 +59,7 @@ public class RequestsPage extends JFrame {
 
         // Слушатели для кнопок
         deleteButton.addActionListener(e -> deleteRequest());
-
+        editButton.addActionListener(e -> editRequest());
         loadRequests(); // Загружаем данные запросов при инициализации
     }
 
@@ -63,6 +67,29 @@ public class RequestsPage extends JFrame {
     private void loadRequests() {
         List<Request> allRequests = RequestDAO.findAll();
         updateRequestTable(allRequests);
+    }
+
+    private void editRequest(){
+        int selectedRow = requestsTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a request to edit.", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int requestId = (int) requestsTable.getValueAt(selectedRow, 0); // Получаем ID выбранного запроса
+        Request request = RequestDAO.findById(requestId); // Загружаем запрос из базы данных
+
+        if (request == null) {
+            JOptionPane.showMessageDialog(this, "Request not found in the database.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Открываем диалоговое окно для редактирования
+        EditRequestDialog editDialog = new EditRequestDialog(this, request.getRequestId());
+        editDialog.setVisible(true);
+
+        // Обновляем таблицу после закрытия диалогового окна
+        loadRequests();
     }
 
     // Метод для обновления таблицы запросов

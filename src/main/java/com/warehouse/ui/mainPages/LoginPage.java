@@ -40,15 +40,23 @@ public class LoginPage {
         passwordField = new JPasswordField();
 
         JButton loginButton = new JButton("Войти");
-        JButton cancelButton = new JButton("Очистить");
 
         panel.add(loginLabel);
         panel.add(loginField);
         panel.add(passwordLabel);
         panel.add(passwordField);
         panel.add(loginButton);
-        panel.add(cancelButton);
+        JButton registerButton = new JButton("Регистрация");
+        panel.add(registerButton); // Добавляем кнопку на панель
 
+// Обработчик нажатия кнопки "Регистрация"
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new RegistrationPage(); // Открываем страницу регистрации
+            }
+        });
         frame.add(panel);
 
         // Обработчик нажатия кнопки "Войти"
@@ -78,15 +86,6 @@ public class LoginPage {
                 }
             }
 
-        });
-
-        // Обработчик нажатия кнопки "Отмена"
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loginField.setText("");
-                passwordField.setText("");
-            }
         });
 
         frame.setVisible(true);

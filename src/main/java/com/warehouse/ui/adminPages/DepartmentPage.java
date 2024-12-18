@@ -37,9 +37,10 @@ public class DepartmentPage extends JFrame {
         addButton = new JButton("Add Department");
         editButton = new JButton("Edit Department");
         backButton = new JButton("Back");
+
+        toolbar.add(backButton);
         toolbar.add(addButton);
         toolbar.add(editButton);
-        toolbar.add(backButton);
 
         // Добавляем таблицу и кнопки
         add(new JScrollPane(departmentTable), BorderLayout.CENTER);

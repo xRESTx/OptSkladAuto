@@ -16,7 +16,7 @@ public class CategoryPage extends JFrame {
 
     public CategoryPage() {
         setTitle("Categories");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 

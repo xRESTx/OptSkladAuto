@@ -24,7 +24,7 @@ public class RequestDAO {
         }
     }
 
-    public Request findById(int requestId) {
+    public static Request findById(int requestId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Request.class, requestId);
         }
@@ -36,7 +36,7 @@ public class RequestDAO {
         }
     }
 
-    public void update(Request request) {
+    public static void update(Request request) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
