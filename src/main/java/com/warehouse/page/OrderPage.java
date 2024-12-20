@@ -207,8 +207,6 @@ public class OrderPage {
         frame.setVisible(true);
     }
 
-
-
     private static void showOrderDetails(Order order) {
         JFrame frame = new JFrame("Order Details");
         frame.setSize(800, 600);
