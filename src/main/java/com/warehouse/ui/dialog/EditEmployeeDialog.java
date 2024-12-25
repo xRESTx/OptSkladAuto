@@ -26,7 +26,7 @@ public class EditEmployeeDialog extends JDialog {
         setLayout(new BorderLayout());
         setLocationRelativeTo(parent);
 
-        JPanel formPanel = new JPanel(new GridLayout(9, 2, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(8, 2, 10, 10));
 
         // Поля формы
         formPanel.add(new JLabel("Passport Data:"));
@@ -54,10 +54,6 @@ public class EditEmployeeDialog extends JDialog {
         birthdayField = new JTextField(new SimpleDateFormat("yyyy-MM-dd").format(employee.getBirthday()));
         formPanel.add(birthdayField);
 
-        formPanel.add(new JLabel("Password:"));
-        passwordField = new JTextField(employee.getPassword());
-        passwordField.setEditable(false);
-        formPanel.add(passwordField);
 
         formPanel.add(new JLabel("Contract:"));
         contractField = new JTextField(String.valueOf(employee.getContract().getContractNumber()));

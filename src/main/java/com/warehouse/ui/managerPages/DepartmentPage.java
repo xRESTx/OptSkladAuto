@@ -14,7 +14,7 @@ public class DepartmentPage extends JFrame {
 
     private JTable departmentTable;
     private DefaultTableModel tableModel;
-    private JButton addButton, editButton, backButton;
+    private JButton  backButton;
 
     public DepartmentPage() {
         setTitle("Department Management");
@@ -35,21 +35,15 @@ public class DepartmentPage extends JFrame {
 
         // Кнопки
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        addButton = new JButton("Add Department");
-        editButton = new JButton("Edit Department");
         backButton = new JButton("Back");
 
         toolbar.add(backButton);
-        toolbar.add(addButton);
-        toolbar.add(editButton);
 
         // Добавляем таблицу и кнопки
         add(new JScrollPane(departmentTable), BorderLayout.CENTER);
         add(toolbar, BorderLayout.NORTH);
 
         // Логика кнопок
-        addButton.addActionListener(e -> addDepartment());
-        editButton.addActionListener(e -> editDepartment());
         backButton.addActionListener(e -> {
             dispose(); // Закрываем текущее окно
             new ManagerMainPage(); // Возвращаемся на главную страницу
