@@ -2,10 +2,10 @@ package com.warehouse.dao;
 
 import com.warehouse.models.Request;
 import com.warehouse.utils.HibernateUtil;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import javax.persistence.Query;
 import java.util.List;
 
 public class RequestDAO {
@@ -87,5 +87,17 @@ public class RequestDAO {
             e.printStackTrace();
         }
     }
+
+    public static List<Request> findRequestsByEmployeeLogin(String employeeLogin) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Request WHERE employee.employeeLogin = :login", Request.class)
+                    .setParameter("login", employeeLogin)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch requests for employee login: " + employeeLogin);
+        }
+    }
+
 
 }

@@ -187,5 +187,15 @@ public class OrderDAO {
 
         return orderId; // Возвращаем ID нового заказа
     }
+    public static List<Order> findOrdersByEmployeeLogin(String employeeLogin) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Order WHERE employee.employeeLogin = :login", Order.class)
+                    .setParameter("login", employeeLogin)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch orders for employee login: " + employeeLogin);
+        }
+    }
 
 }

@@ -1,6 +1,6 @@
 package com.warehouse.ui.managerPages;
 
-import com.warehouse.ui.adminPages.*;
+import com.warehouse.ui.managerPages.*;
 import com.warehouse.ui.adminPages.categoryPages.CategoryPage;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class ManagerMainPage {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // Вертикальное расположение
 
         // Заголовок
-        JLabel titleLabel = new JLabel("Главная страница для сотрудников", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Главная страница для менеджеров", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(titleLabel);
@@ -30,13 +30,12 @@ public class ManagerMainPage {
 
         // Кнопки перехода на страницы
         JButton ordersButton = new JButton("Управление заказами");
-        JButton productsButton = new JButton("Управление товарами");
         JButton employeesButton = new JButton("Управление сотрудниками");
         JButton contractButton = new JButton("Управление контрактами");
         JButton paymentsButton = new JButton("Управление платежами");
-        JButton departmentButton = new JButton("Управление отделами");
         JButton requestButton = new JButton("Управление запросами");
-        JButton CategoryButton = new JButton("Управление категориями");
+        JButton departmentButton = new JButton("Просмотр отделов");
+        JButton productsButton = new JButton("Просмотр товаров");
 
         // Центрируем кнопки
         ordersButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -46,12 +45,10 @@ public class ManagerMainPage {
         paymentsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         departmentButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         requestButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        CategoryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Добавляем кнопки на панель
         panel.add(ordersButton);
-        panel.add(Box.createVerticalStrut(10)); // Отступ между кнопками
-        panel.add(productsButton);
+
         panel.add(Box.createVerticalStrut(10));
         panel.add(employeesButton);
         panel.add(Box.createVerticalStrut(10));
@@ -59,11 +56,11 @@ public class ManagerMainPage {
         panel.add(Box.createVerticalStrut(10));
         panel.add(paymentsButton);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(departmentButton);
-        panel.add(Box.createVerticalStrut(10));
         panel.add(requestButton);
+        panel.add(Box.createVerticalStrut(10)); // Отступ между кнопками
+        panel.add(productsButton);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(CategoryButton);
+        panel.add(departmentButton);
 
         // Добавляем обработчики событий для кнопок
         ordersButton.addActionListener(e -> openOrdersPage(frame));
@@ -73,7 +70,6 @@ public class ManagerMainPage {
         paymentsButton.addActionListener(e -> openPaymentsPage(frame));
         departmentButton.addActionListener(e -> openDepartmentPage(frame));
         requestButton.addActionListener(e -> openRequestPage(frame));
-        CategoryButton.addActionListener(e -> openCategoryPage(frame));
 
         // Добавляем панель на окно
         frame.add(panel);
@@ -92,7 +88,7 @@ public class ManagerMainPage {
 
     private void openProductsPage(JFrame parentFrame) {
         parentFrame.dispose();
-        new ProductsPage().setVisible(true); // Открываем страницу товаров
+        new ManagerProductPage().setVisible(true); // Открываем страницу товаров
     }
 
     private void openEmployeesPage(JFrame parentFrame) {
@@ -115,8 +111,4 @@ public class ManagerMainPage {
         new DepartmentPage().setVisible(true); // Открываем страницу платежей
     }
 
-    private void openCategoryPage(JFrame parentFrame) {
-        parentFrame.dispose();
-        new CategoryPage().setVisible(true); // Открываем страницу платежей
-    }
 }
