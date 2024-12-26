@@ -98,6 +98,22 @@ public class RequestDAO {
             throw new RuntimeException("Failed to fetch requests for employee login: " + employeeLogin);
         }
     }
+    public static boolean saveRequest(Request request) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
 
+            session.save(request); // Сохраняем объект Request в базу данных
+
+            transaction.commit();
+            return true; // Возвращаем true, если запрос успешно сохранен
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback(); // Откатываем транзакцию в случае ошибки
+            }
+            e.printStackTrace();
+            return false; // Возвращаем false в случае ошибки
+        }
+    }
 
 }

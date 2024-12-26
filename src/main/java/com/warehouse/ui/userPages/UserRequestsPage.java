@@ -1,19 +1,22 @@
 package com.warehouse.ui.userPages;
 
+import com.warehouse.dao.*;
 import com.warehouse.dao.RequestDAO;
-import com.warehouse.models.Request;
+import com.warehouse.models.*;
+import com.warehouse.models.Account;
 import com.warehouse.utils.SessionManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserRequestsPage extends JFrame {
     private JTable requestsTable;
-    private JButton backButton;
+    private JButton backButton, addRequestButton;
 
     public UserRequestsPage() {
         setTitle("Requests Management");
@@ -24,6 +27,7 @@ public class UserRequestsPage extends JFrame {
         // Панель инструментов
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         backButton = new JButton("Назад");
+        addRequestButton = new JButton("Добавить запрос");
 
         // Кнопка "Назад"
         backButton.addActionListener(e -> {
@@ -31,8 +35,12 @@ public class UserRequestsPage extends JFrame {
             new UserMainPage().setVisible(true); // Возвращаемся на главную страницу
         });
 
+        // Кнопка "Добавить запрос"
+        addRequestButton.addActionListener(e -> openAddRequestDialog());
+
         // Добавляем кнопки на панель инструментов
         toolbar.add(backButton);
+        toolbar.add(addRequestButton);
 
         // Таблица запросов
         String[] columnNames = {"Request Number", "Customer", "Date", "Status", "Text Request", "Employee", "Number Order"};
@@ -55,11 +63,6 @@ public class UserRequestsPage extends JFrame {
         loadRequests(); // Загружаем данные запросов при инициализации
     }
 
-    // Метод для загрузки всех запросов
-//    private void loadRequests() {
-//        List<Request> allRequests = RequestDAO.findAll();
-//        updateRequestTable(allRequests);
-//    }
     private void loadRequests() {
         String currentLogin = SessionManager.getCurrentUserLogin();
         List<Request> allRequests = RequestDAO.findAll();
@@ -71,11 +74,10 @@ public class UserRequestsPage extends JFrame {
 
         updateRequestTable(userRequests);
     }
-    // Метод для обновления таблицы запросов
+
     private void updateRequestTable(List<Request> requests) {
         String[] columnNames = {"Request Number", "Customer", "Date", "Status", "Text Request", "Employee", "Number Order"};
 
-        // Преобразуем List<Request> в двумерный массив для JTable
         Object[][] data = new Object[requests.size()][7];
         for (int i = 0; i < requests.size(); i++) {
             Request request = requests.get(i);
@@ -84,41 +86,91 @@ public class UserRequestsPage extends JFrame {
             data[i][2] = request.getDateRequest();
             data[i][3] = request.getStatusOrder();
             data[i][4] = request.getTextRequest();
-            data[i][5] = request.getEmployee().getEmployeeLogin();
-            data[i][6] = request.getOrders().getNumberOrder();
+            data[i][5] = request.getEmployee() != null ? request.getEmployee().getEmployeeLogin() : "N/A";
+            data[i][6] = request.getOrders() != null ? request.getOrders().getNumberOrder() : "N/A";
         }
 
-        // Обновляем модель таблицы
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Запрещает редактирование всех ячеек
+                return false;
             }
         };
         requestsTable.setModel(model);
 
-        // Настроить сортировку для таблицы
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
         requestsTable.setRowSorter(sorter);
     }
+    private void openAddRequestDialog() {
+        JDialog addRequestDialog = new JDialog(this, "Добавить запрос", true);
+        addRequestDialog.setSize(400, 300);
+        addRequestDialog.setLayout(new GridLayout(3, 2, 10, 10));
+        addRequestDialog.setLocationRelativeTo(this);
 
-    // Метод для удаления запроса
-    private void deleteRequest() {
-        int selectedRow = requestsTable.getSelectedRow();
-        if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a request to delete.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
+        JLabel textRequestLabel = new JLabel("Текст запроса:");
+        JTextField textRequestField = new JTextField();
+
+        JLabel orderNumberLabel = new JLabel("Номер заказа:");
+        JComboBox<String> orderNumberComboBox = new JComboBox<>();
+
+        // Загружаем список заказов текущего пользователя
+        List<Order> orderNumbers = OrderDAO.findOrdersByUserLogin(SessionManager.getCurrentUserLogin());
+        //orderNumbers.add("N/A"); // Добавляем опцию "N/A" для запросов без заказа
+        for (Order orderNumber : orderNumbers) {
+            orderNumberComboBox.addItem(String.valueOf(orderNumber.getNumberOrder()));
         }
 
-        int requestId = (int) requestsTable.getValueAt(selectedRow, 0);
-        int confirmation = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to delete request #" + requestId + "?",
-                "Delete Confirmation",
-                JOptionPane.YES_NO_OPTION);
+        JButton saveButton = new JButton("Сохранить");
+        JButton cancelButton = new JButton("Отмена");
 
-        if (confirmation == JOptionPane.YES_OPTION) {
-            RequestDAO.deleteRequestById(requestId); // Удаляем запрос по id
-            loadRequests(); // Обновляем таблицу запросов
-        }
+        saveButton.addActionListener(e -> {
+            String textRequest = textRequestField.getText().trim();
+            String selectedOrderNumber = (String) orderNumberComboBox.getSelectedItem();
+
+            if (textRequest.isEmpty()) {
+                JOptionPane.showMessageDialog(addRequestDialog, "Текст запроса не может быть пустым!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Создаем новый запрос
+            Request newRequest = new Request();
+            newRequest.setTextRequest(textRequest);
+            newRequest.setDateRequest(new Date());
+            newRequest.setStatusOrder("Новый");
+
+            // Устанавливаем текущего пользователя
+            String currentLogin = SessionManager.getCurrentUserLogin();
+            Account currentAccount = AccountDAO.findById(currentLogin);
+            newRequest.setAccount(currentAccount);
+
+            // Устанавливаем номер заказа, если он выбран
+            if (!"N/A".equals(selectedOrderNumber)) {
+                newRequest.setOrders(OrderDAO.findOrderByNumber(Integer.parseInt(selectedOrderNumber)));
+            } else {
+                newRequest.setOrders(null); // Если "N/A", заказа нет
+            }
+
+            // Сохраняем запрос
+            if (RequestDAO.saveRequest(newRequest)) {
+                JOptionPane.showMessageDialog(addRequestDialog, "Запрос успешно добавлен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                addRequestDialog.dispose();
+                loadRequests(); // Обновляем таблицу запросов
+            } else {
+                JOptionPane.showMessageDialog(addRequestDialog, "Ошибка при добавлении запроса. Попробуйте снова.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        cancelButton.addActionListener(e -> addRequestDialog.dispose());
+
+        // Добавляем компоненты в диалог
+        addRequestDialog.add(textRequestLabel);
+        addRequestDialog.add(textRequestField);
+        addRequestDialog.add(orderNumberLabel);
+        addRequestDialog.add(orderNumberComboBox);
+        addRequestDialog.add(saveButton);
+        addRequestDialog.add(cancelButton);
+
+        addRequestDialog.setVisible(true);
     }
+
 }
