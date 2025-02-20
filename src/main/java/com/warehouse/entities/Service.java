@@ -3,11 +3,11 @@ package com.warehouse.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Departments")
-public class Department {
+@Table(name = "Services")
+public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id")
+    @Column(name = "service_id")
     private int id;
 
     @Column(name = "name", nullable = false)
@@ -16,7 +16,17 @@ public class Department {
     @Column(name = "description")
     private String description;
 
-    // Getters, setters, constructors...
+    @Column(name = "unit")
+    private String unit;
+
+    public Service() {
+    }
+
+    public Service(String name, String description, String unit) {
+        this.name = name;
+        this.description = description;
+        this.unit = unit;
+    }
 
     public int getId() {
         return id;
@@ -42,8 +52,11 @@ public class Department {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return name;
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

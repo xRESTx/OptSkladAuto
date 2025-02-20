@@ -5,64 +5,37 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Clients")
 public class Client {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "client_id")
-    private int clientId;
+    @Column(name = "customer_id")
+    private int id;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "password", nullable = false)
+    private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
+    @Column(name = "role", nullable = false)
+    private String role;
 
-    // Конструктор по умолчанию
     public Client() {
     }
 
-    // Конструктор с параметрами
-    public Client(String fullName, String phoneNumber, String email, String address, Account account) {
+    public Client(String fullName, String email) {
         this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
         this.email = email;
-        this.address = address;
-        this.account = account;
     }
 
-    // Getters и Setters
-    public int getClientId() {
-        return clientId;
+    public int getId() {
+        return id;
     }
 
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -73,23 +46,27 @@ public class Client {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public Account getAccount() {
-        return account;
+    public String getPassword() {
+        return password;
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setPassword(String password) {
+        this.password = password;
     }
-    @Override
-    public String toString() {
-        return fullName;  // Вернет только полное имя клиента
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

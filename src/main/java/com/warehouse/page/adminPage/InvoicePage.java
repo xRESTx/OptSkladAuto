@@ -1,0 +1,353 @@
+package com.warehouse.page.adminPage;
+
+import com.warehouse.entities.Invoice;
+import com.warehouse.entities.MeterReading;
+import com.warehouse.entities.Service;
+import com.warehouse.entities.Tariff;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.List;
+
+public class InvoicePage {
+    private static SessionFactory factory = new Configuration()
+            .configure("hibernate.cfg.xml")
+            .addAnnotatedClass(Invoice.class)
+            .addAnnotatedClass(Service.class)
+            .addAnnotatedClass(Tariff.class)
+            .addAnnotatedClass(MeterReading.class)
+            .buildSessionFactory();
+
+    public static void showInvoicePage() {
+        JFrame frame = new JFrame("Invoice Management");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        frame.add(mainPanel);
+
+        JLabel titleLabel = new JLabel("Invoice List", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        String[] columnNames = {"ID", "Service", "Tariff", "Reading", "Billing Period", "Status"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable invoiceTable = new JTable(tableModel);
+
+        JScrollPane scrollPane = new JScrollPane(invoiceTable);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+
+        JButton addButton = new JButton("Add Invoice");
+        addButton.addActionListener(e -> addInvoice(tableModel));
+        buttonPanel.add(addButton);
+
+        JButton editButton = new JButton("Edit Invoice");
+        editButton.addActionListener(e -> editInvoice(invoiceTable, tableModel));
+        buttonPanel.add(editButton);
+
+        JButton deleteButton = new JButton("Delete Invoice");
+        deleteButton.addActionListener(e -> deleteInvoice(invoiceTable, tableModel));
+        buttonPanel.add(deleteButton);
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> frame.dispose());
+        buttonPanel.add(closeButton);
+
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        loadInvoiceData(tableModel);
+
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private static void loadInvoiceData(DefaultTableModel tableModel) {
+        try (Session session = factory.openSession()) {
+            List<Invoice> invoices = session.createQuery("from Invoice", Invoice.class).list();
+            for (Invoice invoice : invoices) {
+                tableModel.addRow(new Object[]{
+                        invoice.getId(),
+                        invoice.getService().getName(),
+                        invoice.getTariff().getRate(),
+                        invoice.getReading() != null ? invoice.getReading().getReadingValue() : "N/A",
+                        invoice.getBillingPeriod(),
+                        invoice.getStatus()
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error loading invoices: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void addInvoice(DefaultTableModel tableModel) {
+        JDialog addDialog = new JDialog();
+        addDialog.setTitle("Add Invoice");
+        addDialog.setSize(400, 350);
+        addDialog.setLayout(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridLayout(5, 2));
+
+        JComboBox<String> serviceComboBox = new JComboBox<>();
+        JComboBox<String> tariffComboBox = new JComboBox<>();
+        JComboBox<String> readingComboBox = new JComboBox<>();
+        JTextField billingPeriodField = new JTextField(LocalDate.now().toString());
+        JTextField statusField = new JTextField();
+
+        // Подгружаем данные в JComboBox
+        try (Session session = factory.openSession()) {
+            List<Service> services = session.createQuery("from Service", Service.class).list();
+            for (Service service : services) {
+                serviceComboBox.addItem(service.getName());
+            }
+
+            List<Tariff> tariffs = session.createQuery("from Tariff", Tariff.class).list();
+            for (Tariff tariff : tariffs) {
+                tariffComboBox.addItem("ID: " + tariff.getId() + " - " + tariff.getRate());
+            }
+
+            List<MeterReading> readings = session.createQuery("from MeterReading", MeterReading.class).list();
+            for (MeterReading reading : readings) {
+                readingComboBox.addItem("ID: " + reading.getId() + " - " + reading.getReadingValue());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error loading data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        formPanel.add(new JLabel("Service: "));
+        formPanel.add(serviceComboBox);
+        formPanel.add(new JLabel("Tariff: "));
+        formPanel.add(tariffComboBox);
+        formPanel.add(new JLabel("Reading: "));
+        formPanel.add(readingComboBox);
+        formPanel.add(new JLabel("Billing Period: "));
+        formPanel.add(billingPeriodField);
+        formPanel.add(new JLabel("Status: "));
+        formPanel.add(statusField);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            String serviceName = (String) serviceComboBox.getSelectedItem();
+            String tariffInfo = (String) tariffComboBox.getSelectedItem();
+            String readingInfo = (String) readingComboBox.getSelectedItem();
+            LocalDate billingPeriod = LocalDate.parse(billingPeriodField.getText());
+            String status = statusField.getText();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Service service = session.createQuery("from Service where name = :name", Service.class)
+                        .setParameter("name", serviceName)
+                        .uniqueResult();
+
+                int tariffId = Integer.parseInt(tariffInfo.split(" ")[1]);
+                Tariff tariff = session.get(Tariff.class, tariffId);
+
+                int readingId = Integer.parseInt(readingInfo.split(" ")[1]);
+                MeterReading reading = session.get(MeterReading.class, readingId);
+
+                if (service == null || tariff == null || reading == null) {
+                    JOptionPane.showMessageDialog(null, "Invalid selection", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Invoice invoice = new Invoice(service, tariff, reading, billingPeriod, status);
+                session.save(invoice);
+                session.getTransaction().commit();
+
+                tableModel.addRow(new Object[]{
+                        invoice.getId(),
+                        service.getName(),
+                        tariff.getRate(),
+                        reading.getReadingValue(),
+                        billingPeriod,
+                        status
+                });
+
+                addDialog.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error saving invoice: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> addDialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(saveButton);
+        buttonPanel.add(closeButton);
+
+        addDialog.add(formPanel, BorderLayout.CENTER);
+        addDialog.add(buttonPanel, BorderLayout.SOUTH);
+        addDialog.setLocationRelativeTo(null);
+        addDialog.setModal(true);
+        addDialog.setVisible(true);
+    }
+
+    private static void editInvoice(JTable invoiceTable, DefaultTableModel tableModel) {
+        int selectedRow = invoiceTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select an invoice to edit.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int invoiceId = (int) tableModel.getValueAt(selectedRow, 0);
+
+        JDialog editDialog = new JDialog();
+        editDialog.setTitle("Edit Invoice");
+        editDialog.setSize(400, 350);
+        editDialog.setLayout(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridLayout(5, 2));
+
+        JComboBox<String> serviceComboBox = new JComboBox<>();
+        JComboBox<String> tariffComboBox = new JComboBox<>();
+        JComboBox<String> readingComboBox = new JComboBox<>();
+        JTextField billingPeriodField = new JTextField(tableModel.getValueAt(selectedRow, 4).toString());
+        JTextField statusField = new JTextField(tableModel.getValueAt(selectedRow, 5).toString());
+
+        // Подгружаем данные в JComboBox
+        try (Session session = factory.openSession()) {
+            Invoice invoice = session.get(Invoice.class, invoiceId);
+            if (invoice == null) {
+                JOptionPane.showMessageDialog(null, "Invoice not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            List<Service> services = session.createQuery("from Service", Service.class).list();
+            for (Service service : services) {
+                serviceComboBox.addItem(service.getName());
+            }
+            serviceComboBox.setSelectedItem(invoice.getService().getName());
+
+            List<Tariff> tariffs = session.createQuery("from Tariff", Tariff.class).list();
+            for (Tariff tariff : tariffs) {
+                tariffComboBox.addItem("ID: " + tariff.getId() + " - " + tariff.getRate());
+            }
+            tariffComboBox.setSelectedItem("ID: " + invoice.getTariff().getId() + " - " + invoice.getTariff().getRate());
+
+            List<MeterReading> readings = session.createQuery("from MeterReading", MeterReading.class).list();
+            for (MeterReading reading : readings) {
+                readingComboBox.addItem("ID: " + reading.getId() + " - " + reading.getReadingValue());
+            }
+            readingComboBox.setSelectedItem("ID: " + invoice.getReading().getId() + " - " + invoice.getReading().getReadingValue());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error loading data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        formPanel.add(new JLabel("Service: "));
+        formPanel.add(serviceComboBox);
+        formPanel.add(new JLabel("Tariff: "));
+        formPanel.add(tariffComboBox);
+        formPanel.add(new JLabel("Reading: "));
+        formPanel.add(readingComboBox);
+        formPanel.add(new JLabel("Billing Period: "));
+        formPanel.add(billingPeriodField);
+        formPanel.add(new JLabel("Status: "));
+        formPanel.add(statusField);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            String serviceName = (String) serviceComboBox.getSelectedItem();
+            String tariffInfo = (String) tariffComboBox.getSelectedItem();
+            String readingInfo = (String) readingComboBox.getSelectedItem();
+            LocalDate billingPeriod = LocalDate.parse(billingPeriodField.getText());
+            String status = statusField.getText();
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+
+                Invoice invoice = session.get(Invoice.class, invoiceId);
+                if (invoice == null) {
+                    JOptionPane.showMessageDialog(null, "Invoice not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Service service = session.createQuery("from Service where name = :name", Service.class)
+                        .setParameter("name", serviceName)
+                        .uniqueResult();
+
+                int tariffId = Integer.parseInt(tariffInfo.split(" ")[1]);
+                Tariff tariff = session.get(Tariff.class, tariffId);
+
+                int readingId = Integer.parseInt(readingInfo.split(" ")[1]);
+                MeterReading reading = session.get(MeterReading.class, readingId);
+
+                if (service == null || tariff == null || reading == null) {
+                    JOptionPane.showMessageDialog(null, "Invalid selection", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                invoice.setService(service);
+                invoice.setTariff(tariff);
+                invoice.setReading(reading);
+                invoice.setBillingPeriod(billingPeriod);
+                invoice.setStatus(status);
+
+                session.update(invoice);
+                session.getTransaction().commit();
+
+                tableModel.setValueAt(service.getName(), selectedRow, 1);
+                tableModel.setValueAt(tariff.getRate(), selectedRow, 2);
+                tableModel.setValueAt(reading.getReadingValue(), selectedRow, 3);
+                tableModel.setValueAt(billingPeriod, selectedRow, 4);
+                tableModel.setValueAt(status, selectedRow, 5);
+
+                editDialog.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error updating invoice: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> editDialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(saveButton);
+        buttonPanel.add(closeButton);
+
+        editDialog.add(formPanel, BorderLayout.CENTER);
+        editDialog.add(buttonPanel, BorderLayout.SOUTH);
+        editDialog.setLocationRelativeTo(null);
+        editDialog.setModal(true);
+        editDialog.setVisible(true);
+    }
+
+    private static void deleteInvoice(JTable invoiceTable, DefaultTableModel tableModel) {
+        int selectedRow = invoiceTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(null, "Please select an invoice to delete.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int invoiceId = (int) tableModel.getValueAt(selectedRow, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(null,
+                "Are you sure you want to delete this invoice?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try (Session session = factory.openSession()) {
+            session.beginTransaction();
+            Invoice invoice = session.get(Invoice.class, invoiceId);
+            if (invoice != null) {
+                session.delete(invoice);
+                session.getTransaction().commit();
+                tableModel.removeRow(selectedRow);
+                JOptionPane.showMessageDialog(null, "Invoice deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invoice not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error deleting invoice: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

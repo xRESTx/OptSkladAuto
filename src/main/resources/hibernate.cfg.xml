@@ -30,18 +30,12 @@
         <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 
         <!-- Маппинг сущностей -->
-        <mapping class="com.warehouse.entities.Account"/>
         <mapping class="com.warehouse.entities.Client"/>
-        <mapping class="com.warehouse.entities.Contract"/>
-        <mapping class="com.warehouse.entities.Delivery"/>
-        <mapping class="com.warehouse.entities.Department"/>
-        <mapping class="com.warehouse.entities.Employee"/>
-        <mapping class="com.warehouse.entities.Order"/>
-        <mapping class="com.warehouse.entities.OrderItem"/>
+        <mapping class="com.warehouse.entities.Invoice"/>
+        <mapping class="com.warehouse.entities.MeterReading"/>
+        <mapping class="com.warehouse.entities.Meter"/>
         <mapping class="com.warehouse.entities.Payment"/>
-        <mapping class="com.warehouse.entities.Position"/>
-        <mapping class="com.warehouse.entities.Product"/>
-        <mapping class="com.warehouse.entities.Request"/>
-        <mapping class="com.warehouse.entities.Supplier"/>
+        <mapping class="com.warehouse.entities.Service"/>
+        <mapping class="com.warehouse.entities.Tariff"/>
     </session-factory>
 </hibernate-configuration>

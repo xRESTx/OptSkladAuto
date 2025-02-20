@@ -11,19 +11,13 @@ public class HibernateUtil {
         try {
             sessionFactory = new Configuration()
                     .configure()
-                    .addAnnotatedClass(Account.class)
                     .addAnnotatedClass(Client.class)
-                    .addAnnotatedClass(Position.class)
-                    .addAnnotatedClass(Employee.class)
-                    .addAnnotatedClass(Contract.class)
-                    .addAnnotatedClass(Order.class)
-                    .addAnnotatedClass(Request.class)
-                    .addAnnotatedClass(Department.class)
-                    .addAnnotatedClass(Product.class)
+                    .addAnnotatedClass(Invoice.class)
+                    .addAnnotatedClass(Meter.class)
+                    .addAnnotatedClass(MeterReading.class)
                     .addAnnotatedClass(Payment.class)
-                    .addAnnotatedClass(OrderItem.class)
-                    .addAnnotatedClass(Supplier.class)
-                    .addAnnotatedClass(Delivery.class)
+                    .addAnnotatedClass(Service.class)
+                    .addAnnotatedClass(Tariff.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("SessionFactory creation failed: " + ex);

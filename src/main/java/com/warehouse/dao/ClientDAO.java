@@ -10,38 +10,31 @@ import java.util.List;
 
 public class ClientDAO {
 
-    public static int getClientIdByUsername(String username) {
+    public int getClientIdByUsername(String username) {
         int clientId = -1;
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT c.clientId " +
-                         "FROM Client c " +
-                         "JOIN c.account a " +
-                         "WHERE a.username = :username";
-
+            String hql = "SELECT c.id FROM Client c WHERE c.account.username = :username";
             Query<Integer> query = session.createQuery(hql, Integer.class);
             query.setParameter("username", username);
             clientId = query.uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return clientId;
     }
 
-
     public boolean save(Client client) {
-        try {
-            // Assuming you are using Hibernate or any ORM to save
-            Session session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
             session.save(client);
-            session.getTransaction().commit();
-            session.close();
-            return true;  // Return true if save is successful
+            transaction.commit();
+            return true;
         } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
             e.printStackTrace();
-            return false;  // Return false if an exception occurs
+            return false;
         }
     }
 
@@ -69,11 +62,14 @@ public class ClientDAO {
         }
     }
 
-    public void delete(Client client) {
+    public void delete(int clientId) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.delete(client);
+            Client client = session.get(Client.class, clientId);
+            if (client != null) {
+                session.delete(client);
+            }
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
