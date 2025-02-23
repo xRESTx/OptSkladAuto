@@ -1,6 +1,7 @@
 package com.warehouse.page;
 
 import com.warehouse.page.adminPage.*;
+import com.warehouse.page.magarPage.ClientsPageManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,7 @@ public class ManagerDashboard {
         // Создание кнопок
         String[] buttonLabels = {"Clients", "Tariffs", "Services", "Meters", "Meter Readings", "Invoices", "Payments"};
         Runnable[] actions = {
-                ClientsPage::showClientsPage, TariffsPage::showTariffsPage, ServicesPage::showServicesPage,
+                ClientsPageManager::showClientsPage, TariffsPage::showTariffsPage, ServicesPage::showServicesPage,
                 MeterPage::showMeterPage, MeterReadingPage::showMeterReadingPage,
                 InvoicePage::showInvoicePage, PaymentPage::showPaymentPage
         };

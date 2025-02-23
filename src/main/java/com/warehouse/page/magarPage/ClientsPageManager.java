@@ -1,4 +1,4 @@
-package com.warehouse.page.adminPage;
+package com.warehouse.page.magarPage;
 
 import com.warehouse.entities.Client;
 import org.hibernate.Session;
@@ -10,7 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class ClientsPage {
+public class ClientsPageManager {
 
     public static void showClientsPage() {
         JFrame frame = new JFrame("Client Management");
@@ -26,7 +26,7 @@ public class ClientsPage {
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
         // Таблица для отображения данных клиентов
-        String[] columnNames = {"ID", "Full Name", "Email", "Password", "Role", "Username"};
+        String[] columnNames = {"ID", "Full Name", "Email"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable clientTable = new JTable(tableModel);
 
@@ -83,10 +83,7 @@ public class ClientsPage {
                 tableModel.addRow(new Object[]{
                         client.getId(),
                         client.getFullName(),
-                        client.getEmail(),
-                        client.getPassword(),
-                        client.getRole(),
-                        client.getUsername()
+                        client.getEmail()
                 });
             }
 
@@ -102,41 +99,26 @@ public class ClientsPage {
     private static void addClient(DefaultTableModel tableModel) {
         JTextField fullNameField = new JTextField();
         JTextField emailField = new JTextField();
-        JTextField passwordField = new JTextField();
-        JTextField roleField = new JTextField();
-        JTextField usernameField = new JTextField();
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
+        JPanel panel = new JPanel(new GridLayout(2, 2));
         panel.add(new JLabel("Full Name:"));
         panel.add(fullNameField);
         panel.add(new JLabel("Email:"));
         panel.add(emailField);
-        panel.add(new JLabel("Password:"));
-        panel.add(passwordField);
-        panel.add(new JLabel("Role:"));
-        panel.add(roleField);
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add Client", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String fullName = fullNameField.getText().trim();
             String email = emailField.getText().trim();
-            String password = passwordField.getText().trim();
-            String role = roleField.getText().trim();
-            String username = usernameField.getText().trim();
 
             // Проверка на пустые поля
-            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || role.isEmpty() || username.isEmpty()) {
+            if (fullName.isEmpty() || email.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "All fields must be filled out.", "Warning", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             // Создаем новый клиент
             Client client = new Client(fullName, email);
-            client.setPassword(password);
-            client.setRole(role);
-            client.setUsername(username);
 
             SessionFactory factory = new Configuration()
                     .configure("hibernate.cfg.xml")
@@ -155,10 +137,7 @@ public class ClientsPage {
                 tableModel.addRow(new Object[]{
                         client.getId(),
                         client.getFullName(),
-                        client.getEmail(),
-                        client.getPassword(),
-                        client.getRole(),
-                        client.getUsername()
+                        client.getEmail()
                 });
 
                 JOptionPane.showMessageDialog(null, "Client added successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -222,35 +201,20 @@ public class ClientsPage {
         int clientId = (int) tableModel.getValueAt(selectedRow, 0);
         String currentFullName = tableModel.getValueAt(selectedRow, 1).toString();
         String currentEmail = tableModel.getValueAt(selectedRow, 2).toString();
-        String currentPassword = tableModel.getValueAt(selectedRow, 3).toString();
-        String currentRole = tableModel.getValueAt(selectedRow, 4).toString();
-        String currentUsername = tableModel.getValueAt(selectedRow, 5).toString();
 
         JTextField fullNameField = new JTextField(currentFullName);
         JTextField emailField = new JTextField(currentEmail);
-        JTextField passwordField = new JTextField(currentPassword);
-        JTextField roleField = new JTextField(currentRole);
-        JTextField usernameField = new JTextField(currentUsername);
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
+        JPanel panel = new JPanel(new GridLayout(2, 2));
         panel.add(new JLabel("Full Name:"));
         panel.add(fullNameField);
         panel.add(new JLabel("Email:"));
         panel.add(emailField);
-        panel.add(new JLabel("Password:"));
-        panel.add(passwordField);
-        panel.add(new JLabel("Role:"));
-        panel.add(roleField);
-        panel.add(new JLabel("Username:"));
-        panel.add(usernameField);
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Edit Client", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String newFullName = fullNameField.getText();
             String newEmail = emailField.getText();
-            String newPassword = passwordField.getText();
-            String newRole = roleField.getText();
-            String newUsername = usernameField.getText();
 
             SessionFactory factory = new Configuration()
                     .configure("hibernate.cfg.xml")
@@ -264,9 +228,6 @@ public class ClientsPage {
                 if (client != null) {
                     client.setFullName(newFullName);
                     client.setEmail(newEmail);
-                    client.setPassword(newPassword);
-                    client.setRole(newRole);
-                    client.setUsername(newUsername);
 
                     session.update(client);
 
@@ -275,9 +236,6 @@ public class ClientsPage {
                     // Обновляем данные в таблице
                     tableModel.setValueAt(newFullName, selectedRow, 1);
                     tableModel.setValueAt(newEmail, selectedRow, 2);
-                    tableModel.setValueAt(newPassword, selectedRow, 3);
-                    tableModel.setValueAt(newRole, selectedRow, 4);
-                    tableModel.setValueAt(newUsername, selectedRow, 5);
 
                     JOptionPane.showMessageDialog(null, "Client updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 }
