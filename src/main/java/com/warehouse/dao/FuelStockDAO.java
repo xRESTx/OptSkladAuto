@@ -1,19 +1,19 @@
 package com.warehouse.dao;
 
-import com.warehouse.models.Employee;
+import com.warehouse.models.FuelStock;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class EmployeeDAO {
+public class FuelStockDAO {
 
-    public void saveEmployee(Employee employee) {
+    public void saveFuelStock(FuelStock fuelStock) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(employee);
+            session.save(fuelStock);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -21,23 +21,23 @@ public class EmployeeDAO {
         }
     }
 
-    public Employee getEmployeeById(int id) {
+    public FuelStock getFuelStockById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Employee.class, id);
+            return session.get(FuelStock.class, id);
         }
     }
 
-    public List<Employee> getAllEmployees() {
+    public List<FuelStock> getAllFuelStocks() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Employee", Employee.class).list();
+            return session.createQuery("FROM FuelStock", FuelStock.class).list();
         }
     }
 
-    public void updateEmployee(Employee employee) {
+    public void updateFuelStock(FuelStock fuelStock) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.update(employee);
+            session.update(fuelStock);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -45,13 +45,13 @@ public class EmployeeDAO {
         }
     }
 
-    public void deleteEmployee(int id) {
+    public void deleteFuelStock(int id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            Employee employee = session.get(Employee.class, id);
-            if (employee != null) {
-                session.delete(employee);
+            FuelStock fuelStock = session.get(FuelStock.class, id);
+            if (fuelStock != null) {
+                session.delete(fuelStock);
                 transaction.commit();
             }
         } catch (Exception e) {

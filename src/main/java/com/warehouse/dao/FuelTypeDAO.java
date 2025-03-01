@@ -1,19 +1,19 @@
 package com.warehouse.dao;
 
-import com.warehouse.models.Employee;
+import com.warehouse.models.FuelType;
 import com.warehouse.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class EmployeeDAO {
+public class FuelTypeDAO {
 
-    public void saveEmployee(Employee employee) {
+    public void saveFuelType(FuelType fuelType) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(employee);
+            session.save(fuelType);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -21,23 +21,23 @@ public class EmployeeDAO {
         }
     }
 
-    public Employee getEmployeeById(int id) {
+    public FuelType getFuelTypeById(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Employee.class, id);
+            return session.get(FuelType.class, id);
         }
     }
 
-    public List<Employee> getAllEmployees() {
+    public List<FuelType> getAllFuelTypes() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Employee", Employee.class).list();
+            return session.createQuery("FROM FuelType", FuelType.class).list();
         }
     }
 
-    public void updateEmployee(Employee employee) {
+    public void updateFuelType(FuelType fuelType) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.update(employee);
+            session.update(fuelType);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -45,13 +45,13 @@ public class EmployeeDAO {
         }
     }
 
-    public void deleteEmployee(int id) {
+    public void deleteFuelType(int id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            Employee employee = session.get(Employee.class, id);
-            if (employee != null) {
-                session.delete(employee);
+            FuelType fuelType = session.get(FuelType.class, id);
+            if (fuelType != null) {
+                session.delete(fuelType);
                 transaction.commit();
             }
         } catch (Exception e) {

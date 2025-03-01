@@ -1,100 +1,83 @@
 package com.warehouse.models;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Entity
-@Table(name = "employee")
-public class Employee implements Serializable {
-    private static final long serialVersionUID = 1L; // Опционально, но рекомендуется
+@Table(name = "Employees")
+public class Employee {
 
     @Id
-    @Column(name = "passport_data")
-    private int passportData;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "employee_id")
+    private int employeeId;
 
-    @Column(name = "employee_login", unique = true, nullable = false)
-    private String employeeLogin;
+    @ManyToOne
+    @JoinColumn(name = "station_id")
+    private Station station;
 
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "full_name")
+    private String fullName;
 
-    @Column(name = "first_name")
-    private String firstName;
+    @Column(name = "position")
+    private String position;
 
-    @Column(name = "middle_name")
-    private String middleName;
+    @Column(name = "salary")
+    private double salary;
 
-    @Column(name = "birthday")
-    @Temporal(TemporalType.DATE)
-    private Date birthday;
+    @Column(name = "hire_date")
+    private Date hireDate;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
-
-    @ManyToOne
-    @JoinColumn(name = "contract_number", nullable = false)
-    private Contract contract;
-
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Order> orders;
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    private List<Request> requests;
-
     // Getters and Setters
 
-    public int getPassportData() {
-        return passportData;
+    public int getEmployeeId() {
+        return employeeId;
     }
 
-    public void setPassportData(int passportData) {
-        this.passportData = passportData;
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
     }
 
-    public String getEmployeeLogin() {
-        return employeeLogin;
+    public Station getStation() {
+        return station;
     }
 
-    public void setEmployeeLogin(String employeeLogin) {
-        this.employeeLogin = employeeLogin;
+    public void setStation(Station station) {
+        this.station = station;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPosition() {
+        return position;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setPosition(String position) {
+        this.position = position;
     }
 
-    public String getMiddleName() {
-        return middleName;
+    public double getSalary() {
+        return salary;
     }
 
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
+    public void setSalary(double salary) {
+        this.salary = salary;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public Date getHireDate() {
+        return hireDate;
     }
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
+    public void setHireDate(Date hireDate) {
+        this.hireDate = hireDate;
     }
 
     public String getPassword() {
@@ -105,36 +88,9 @@ public class Employee implements Serializable {
         this.password = password;
     }
 
-    public Contract getContract() {
-        return contract;
-    }
-
-    public void setContract(Contract contract) {
-        this.contract = contract;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
-    public List<Request> getRequests() {
-        return requests;
-    }
-
-    public void setRequests(List<Request> requests) {
-        this.requests = requests;
+    @Override
+    public String toString() {
+        return fullName + " (ID: " + employeeId + ")";
     }
 
 }
