@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.SupplierDAO;
 import com.warehouse.models.Supplier;
@@ -41,12 +41,10 @@ public class SuppliersPage extends JFrame {
         JPanel buttonPanel = new JPanel();
         JButton addButton = new JButton("Добавить");
         JButton editButton = new JButton("Редактировать");
-        JButton deleteButton = new JButton("Удалить");
         JButton backButton = new JButton("Назад");
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -56,14 +54,13 @@ public class SuppliersPage extends JFrame {
         // Обработчики событий
         addButton.addActionListener(e -> openSupplierForm(null)); // Добавить новый поставщик
         editButton.addActionListener(e -> editSelectedSupplier()); // Редактировать выбранного поставщика
-        deleteButton.addActionListener(e -> deleteSelectedSupplier()); // Удалить выбранного поставщика
         backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
     // Загрузка данных о поставщиках в таблицу
     private void loadSuppliers() {

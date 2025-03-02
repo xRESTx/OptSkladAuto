@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.TransactionDAO;
 import com.warehouse.models.Transaction;
@@ -41,12 +41,10 @@ public class TransactionsPage extends JFrame {
         JPanel buttonPanel = new JPanel();
         JButton addButton = new JButton("Добавить");
         JButton editButton = new JButton("Редактировать");
-        JButton deleteButton = new JButton("Удалить");
         JButton backButton = new JButton("Назад");
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -56,14 +54,13 @@ public class TransactionsPage extends JFrame {
         // Обработчики событий
         addButton.addActionListener(e -> openTransactionForm(null)); // Добавить новую транзакцию
         editButton.addActionListener(e -> editSelectedTransaction()); // Редактировать выбранную транзакцию
-        deleteButton.addActionListener(e -> deleteSelectedTransaction()); // Удалить выбранную транзакцию
         backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
 
     // Загрузка данных о транзакциях в таблицу

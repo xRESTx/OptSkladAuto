@@ -13,7 +13,6 @@ import java.util.List;
 
 public class TransactionForm extends JDialog {
     private JTextField quantityField;
-    private JTextField totalPriceField;
     private JComboBox<Station> stationComboBox;
     private JComboBox<FuelType> fuelTypeComboBox;
     private TransactionDAO transactionDAO;
@@ -31,7 +30,7 @@ public class TransactionForm extends JDialog {
         setTitle((transaction == null) ? "Добавить транзакцию" : "Редактировать транзакцию");
         setSize(400, 300);
         setLocationRelativeTo(parent);
-        setLayout(new GridLayout(6, 2, 10, 10));
+        setLayout(new GridLayout(4, 2, 10, 10));
 
         add(new JLabel("Станция:"));
         stationComboBox = new JComboBox<>();
@@ -47,10 +46,6 @@ public class TransactionForm extends JDialog {
         quantityField = new JTextField();
         add(quantityField);
 
-        add(new JLabel("Общая сумма:"));
-        totalPriceField = new JTextField();
-        add(totalPriceField);
-
         JButton saveButton = new JButton("Сохранить");
         JButton cancelButton = new JButton("Отмена");
 
@@ -61,7 +56,6 @@ public class TransactionForm extends JDialog {
             stationComboBox.setSelectedItem(transaction.getStation());
             fuelTypeComboBox.setSelectedItem(transaction.getFuelType());
             quantityField.setText(String.valueOf(transaction.getQuantityLiters()));
-            totalPriceField.setText(String.valueOf(transaction.getTotalPrice()));
         }
 
         saveButton.addActionListener(e -> saveTransaction());
@@ -88,9 +82,8 @@ public class TransactionForm extends JDialog {
         Station station = (Station) stationComboBox.getSelectedItem();
         FuelType fuelType = (FuelType) fuelTypeComboBox.getSelectedItem();
         double quantityLiters = Double.parseDouble(quantityField.getText());
-        double totalPrice = Double.parseDouble(totalPriceField.getText());
 
-        if (station == null || fuelType == null || quantityLiters <= 0 || totalPrice <= 0) {
+        if (station == null || fuelType == null || quantityLiters <= 0 ) {
             JOptionPane.showMessageDialog(this, "Все поля должны быть заполнены корректно", "Ошибка", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -102,7 +95,6 @@ public class TransactionForm extends JDialog {
         transaction.setStation(station);
         transaction.setFuelType(fuelType);
         transaction.setQuantityLiters(quantityLiters);
-        transaction.setTotalPrice(totalPrice);
 
         if (transaction.getTransactionId() == 0) {
             transactionDAO.saveTransaction(transaction);

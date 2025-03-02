@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.dao.StationDAO;
@@ -37,22 +37,13 @@ public class StationsPage extends JFrame {
 
         // Кнопки управления
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Добавить");
-        JButton editButton = new JButton("Редактировать");
-        JButton deleteButton = new JButton("Удалить");
         JButton backButton = new JButton("Назад");
 
-        buttonPanel.add(addButton);
-        buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Обработчики событий
-        addButton.addActionListener(e -> addStation());
-        editButton.addActionListener(e -> editStation());
-        deleteButton.addActionListener(e -> deleteStation());
         backButton.addActionListener(e -> goBack());
 
         add(panel);
@@ -182,6 +173,6 @@ public class StationsPage extends JFrame {
 
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
 }

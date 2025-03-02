@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.FuelTypeDAO;
 import com.warehouse.models.FuelType;
@@ -63,7 +63,7 @@ public class FuelTypesPage extends JFrame {
     }
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
     // Загрузка данных о типах топлива в таблицу
     private void loadFuelTypes() {

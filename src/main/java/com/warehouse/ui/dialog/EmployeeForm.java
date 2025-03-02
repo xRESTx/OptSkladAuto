@@ -11,11 +11,12 @@ import java.awt.*;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
 
 public class EmployeeForm extends JDialog {
-    private JTextField nameField, positionField, salaryField;
+    private JTextField nameField, positionField, salaryField, passwordField; // Добавлен пароль
     private JComboBox<Station> stationComboBox;
     private JDatePickerImpl datePicker; // Календарь
     private EmployeeDAO employeeDAO;
@@ -30,7 +31,7 @@ public class EmployeeForm extends JDialog {
 
         setTitle((employee == null) ? "Добавить сотрудника" : "Редактировать сотрудника");
         setSize(400, 300);
-        setLayout(new GridLayout(6, 2, 10, 10));
+        setLayout(new GridLayout(7, 2, 10, 10)); // Добавлен дополнительный ряд для пароля
         setLocationRelativeTo(parent);
 
         add(new JLabel("ФИО:"));
@@ -44,6 +45,10 @@ public class EmployeeForm extends JDialog {
         add(new JLabel("Зарплата:"));
         salaryField = new JTextField();
         add(salaryField);
+
+        add(new JLabel("Пароль:"));
+        passwordField = new JTextField(); // Поле для пароля
+        add(passwordField);
 
         add(new JLabel("Дата найма:"));
         datePicker = createDatePicker();
@@ -71,6 +76,7 @@ public class EmployeeForm extends JDialog {
             }
 
             stationComboBox.setSelectedItem(employee.getStation());
+            passwordField.setText(employee.getPassword()); // Загружаем пароль
         }
 
         saveButton.addActionListener(e -> saveEmployee());
@@ -101,6 +107,7 @@ public class EmployeeForm extends JDialog {
         String name = nameField.getText();
         String position = positionField.getText();
         double salary = Double.parseDouble(salaryField.getText());
+        String password = passwordField.getText(); // Получаем пароль из поля
 
         // Получаем дату из JDatePicker
         java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
@@ -115,6 +122,7 @@ public class EmployeeForm extends JDialog {
         employee.setFullName(name);
         employee.setPosition(position);
         employee.setSalary(salary);
+        employee.setPassword(password); // Устанавливаем пароль
         employee.setHireDate(sqlDate);
         employee.setStation(selectedStation);
 
@@ -127,7 +135,6 @@ public class EmployeeForm extends JDialog {
         dispose();
     }
 
-    // Форматтер даты для JDatePicker
     private static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -138,8 +145,9 @@ public class EmployeeForm extends JDialog {
 
         @Override
         public String valueToString(Object value) {
-            if (value != null) {
-                return dateFormat.format(((java.util.Date) value));
+            if (value instanceof GregorianCalendar) {
+                GregorianCalendar calendar = (GregorianCalendar) value;
+                return dateFormat.format(calendar.getTime());
             }
             return "";
         }

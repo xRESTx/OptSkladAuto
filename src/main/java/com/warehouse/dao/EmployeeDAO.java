@@ -2,8 +2,10 @@ package com.warehouse.dao;
 
 import com.warehouse.models.Employee;
 import com.warehouse.utils.HibernateUtil;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
@@ -57,6 +59,17 @@ public class EmployeeDAO {
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
             e.printStackTrace();
+        }
+    }
+    public Employee getEmployeeByFullNameAndPassword(String fullName, String password) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Используем стандартный Hibernate метод get()
+            for (Employee employee : session.createQuery("FROM Employee", Employee.class).list()) {
+                if (employee.getFullName().equals(fullName) && employee.getPassword().equals(password)) {
+                    return employee; // Возвращаем найденного сотрудника
+                }
+            }
+            return null; // Если нет совпадений
         }
     }
 }

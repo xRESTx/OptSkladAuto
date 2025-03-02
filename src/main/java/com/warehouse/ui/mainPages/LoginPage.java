@@ -5,20 +5,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import com.warehouse.dao.EmployeeDAO;
+import com.warehouse.models.Employee;
 import com.warehouse.ui.adminPages.AdminMainPage;
-import com.warehouse.utils.*;
-
-
-import org.mindrot.jbcrypt.BCrypt;
+import com.warehouse.ui.managerPages.ManagerMainPage;
+import com.warehouse.ui.workerPages.WorkerMainPage;
+import com.warehouse.utils.SessionManager;
 
 public class LoginPage {
-
     private JFrame frame;
     private JTextField loginField;
     private JPasswordField passwordField;
-    private boolean visible;
+    private EmployeeDAO employeeDAO;
 
     public LoginPage() {
+        employeeDAO = new EmployeeDAO();
+
         frame = new JFrame("Вход в систему");
         frame.setSize(400, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -26,9 +28,9 @@ public class LoginPage {
 
         // Панель для компонентов
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 2, 10, 10));
+        panel.setLayout(new GridLayout(4, 2, 10, 10));
 
-        JLabel loginLabel = new JLabel("Логин:");
+        JLabel loginLabel = new JLabel("ФИО:");
         JLabel passwordLabel = new JLabel("Пароль:");
 
         loginField = new JTextField();
@@ -40,6 +42,7 @@ public class LoginPage {
         panel.add(loginField);
         panel.add(passwordLabel);
         panel.add(passwordField);
+        panel.add(new JLabel()); // Пустой JLabel для выравнивания
         panel.add(loginButton);
 
         frame.add(panel);
@@ -48,53 +51,39 @@ public class LoginPage {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String login = loginField.getText();
-                String password = new String(passwordField.getPassword());
-
-//                if (checkEmployeeCredentials(login, password)) {
-//                    // Сохраняем логин текущего пользователя
-//                    SessionManager.setCurrentUserLogin(login);
-//
-//                    frame.dispose(); // Главная страница для сотрудников
-//                } else if (checkAccountCredentials(login, password)) {
-//                    // Сохраняем логин текущего пользователя
-//                    SessionManager.setCurrentUserLogin(login);
-//
-//                    // Если пользователь - клиент (Account), открываем ограниченный функционал
-//                    new UserMainPage().setVisible(true);
-//                    frame.dispose(); // Страница с ограниченным функционалом
-//                } else {
-//                    // Неверный логин/пароль
-//                    JOptionPane.showMessageDialog(frame, "Неверный логин или пароль!", "Ошибка", JOptionPane.ERROR_MESSAGE);
-//                }
+                authenticateUser();
             }
-
         });
 
         frame.setVisible(true);
     }
 
+    private void authenticateUser() {
+        String fullName = loginField.getText().trim();
+        String password = new String(passwordField.getPassword());
+
+        Employee employee = employeeDAO.getEmployeeByFullNameAndPassword(fullName, password);
+
+        if (employee != null) {
+            SessionManager.setCurrentUserLogin(fullName);
+            navigateToEmployeePage(employee.getPosition());
+        } else {
+            JOptionPane.showMessageDialog(frame, "Неверное ФИО или пароль!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void navigateToEmployeePage(String department) {
         switch (department) {
-            case "Admins":
+            case "Admin":
                 new AdminMainPage();
                 break;
-//            case "Managers":
-//                new ManagerMainPage();
-//                break;
-//            default:
-//                new WorkerMainPage();
-//                break;
+            case "Manager":
+                new ManagerMainPage();
+                break;
+            default:
+                new WorkerMainPage();
+                break;
         }
         frame.dispose(); // Закрываем окно входа
-    }
-
-
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    public boolean isVisible() {
-        return visible;
     }
 }

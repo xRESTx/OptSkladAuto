@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.workerPages;
 
 import com.warehouse.dao.TransactionDAO;
 import com.warehouse.models.Transaction;
@@ -41,12 +41,10 @@ public class TransactionsPage extends JFrame {
         JPanel buttonPanel = new JPanel();
         JButton addButton = new JButton("Добавить");
         JButton editButton = new JButton("Редактировать");
-        JButton deleteButton = new JButton("Удалить");
         JButton backButton = new JButton("Назад");
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -56,14 +54,13 @@ public class TransactionsPage extends JFrame {
         // Обработчики событий
         addButton.addActionListener(e -> openTransactionForm(null)); // Добавить новую транзакцию
         editButton.addActionListener(e -> editSelectedTransaction()); // Редактировать выбранную транзакцию
-        deleteButton.addActionListener(e -> deleteSelectedTransaction()); // Удалить выбранную транзакцию
         backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new WorkerMainPage();
     }
 
     // Загрузка данных о транзакциях в таблицу
@@ -100,20 +97,5 @@ public class TransactionsPage extends JFrame {
         Transaction transaction = transactionDAO.getTransactionById(transactionId);
         openTransactionForm(transaction);
     }
-
-    // Удалить выбранную транзакцию
-    private void deleteSelectedTransaction() {
-        int selectedRow = transactionsTable.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Выберите запись для удаления", "Ошибка", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int transactionId = (int) tableModel.getValueAt(selectedRow, 0);
-        int confirm = JOptionPane.showConfirmDialog(this, "Вы уверены, что хотите удалить эту транзакцию?", "Подтверждение", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            transactionDAO.deleteTransaction(transactionId);
-            loadTransactions(); // Обновить таблицу
-        }
-    }
 }
+    

@@ -42,4 +42,8 @@ public class FuelType {
     public void setPricePerLiter(double pricePerLiter) {
         this.pricePerLiter = pricePerLiter;
     }
+
+    public String toString() {
+        return name; // Или любое другое поле, которое хотите отображать
+    }
 }

@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.FuelSupplyDAO;
 import com.warehouse.models.FuelSupply;
@@ -64,7 +64,7 @@ public class FuelSupplyPage extends JFrame {
 
     private void goBack() {
         dispose();
-        new AdminMainPage(); // Возвращаемся на главную страницу админа
+        new ManagerMainPage(); // Возвращаемся на главную страницу админа
     }
 
     // Загрузка данных о поставках топлива в таблицу

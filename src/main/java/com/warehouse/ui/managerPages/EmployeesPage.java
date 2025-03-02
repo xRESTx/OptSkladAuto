@@ -1,8 +1,7 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.models.Employee;
-import com.warehouse.models.Station;
 import com.warehouse.ui.dialog.EmployeeForm;
 
 import javax.swing.*;
@@ -29,7 +28,7 @@ public class EmployeesPage extends JFrame {
 
         // Создаём таблицу с дополнительным столбцом "Пароль"
         tableModel = new DefaultTableModel();
-        tableModel.setColumnIdentifiers(new String[]{"ID", "Имя", "Должность", "Зарплата", "Дата найма", "Станция", "Пароль"});
+        tableModel.setColumnIdentifiers(new String[]{"ID", "Имя", "Должность", "Зарплата", "Дата найма", "Станция"});
         employeeTable = new JTable(tableModel);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
         employeeTable.setRowSorter(sorter);
@@ -65,7 +64,7 @@ public class EmployeesPage extends JFrame {
 
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
 
     // Загрузка данных сотрудников в таблицу
@@ -79,8 +78,7 @@ public class EmployeesPage extends JFrame {
                     emp.getPosition(),
                     emp.getSalary(),
                     emp.getHireDate(),
-                    (emp.getStation() != null) ? emp.getStation().getName() : "Нет",
-                    emp.getPassword() // Добавляем столбец пароля
+                    (emp.getStation() != null) ? emp.getStation().getName() : "Нет"
             });
         }
     }

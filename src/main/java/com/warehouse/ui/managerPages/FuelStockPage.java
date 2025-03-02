@@ -1,4 +1,4 @@
-package com.warehouse.ui.adminPages;
+package com.warehouse.ui.managerPages;
 
 import com.warehouse.dao.FuelStockDAO;
 import com.warehouse.models.FuelStock;
@@ -39,14 +39,10 @@ public class FuelStockPage extends JFrame {
 
         // Кнопки управления
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Добавить");
         JButton editButton = new JButton("Редактировать");
-        JButton deleteButton = new JButton("Удалить");
         JButton backButton = new JButton("Назад");
 
-        buttonPanel.add(addButton);
         buttonPanel.add(editButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -54,16 +50,14 @@ public class FuelStockPage extends JFrame {
         add(panel);
 
         // Обработчики событий
-        addButton.addActionListener(e -> openFuelStockForm(null)); // Добавление
         editButton.addActionListener(e -> editSelectedFuelStock()); // Редактирование
-        deleteButton.addActionListener(e -> deleteSelectedFuelStock()); // Удаление
         backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
     private void goBack() {
         dispose();
-        new AdminMainPage();
+        new ManagerMainPage();
     }
     // Загрузка данных о запасах топлива в таблицу
     private void loadFuelStock() {

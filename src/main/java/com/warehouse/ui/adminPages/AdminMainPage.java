@@ -1,5 +1,7 @@
 package com.warehouse.ui.adminPages;
 
+import com.warehouse.ui.mainPages.LoginPage;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,7 +10,7 @@ public class AdminMainPage {
     public AdminMainPage() {
         // Создаем главное окно
         JFrame frame = new JFrame("Главная страница управления");
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -31,6 +33,7 @@ public class AdminMainPage {
         JButton fuelStockButton = new JButton("Управление запасами топлива");
         JButton fuelSupplyButton = new JButton("Управление поставками топлива");
         JButton transactionsButton = new JButton("Просмотр транзакций");
+        JButton logoutButton = new JButton("Выйти из аккаунта");
 
         // Центрируем кнопки
         stationsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -40,6 +43,7 @@ public class AdminMainPage {
         fuelStockButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         fuelSupplyButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         transactionsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Добавляем кнопки на панель
         panel.add(stationsButton);
@@ -55,6 +59,8 @@ public class AdminMainPage {
         panel.add(fuelSupplyButton);
         panel.add(Box.createVerticalStrut(10));
         panel.add(transactionsButton);
+        panel.add(Box.createVerticalStrut(50));
+        panel.add(logoutButton);
 
         // Добавляем обработчики событий для кнопок
         stationsButton.addActionListener(e -> openStationsPage(frame));
@@ -64,6 +70,7 @@ public class AdminMainPage {
         fuelStockButton.addActionListener(e -> openFuelStockPage(frame));
         fuelSupplyButton.addActionListener(e -> openFuelSupplyPage(frame));
         transactionsButton.addActionListener(e -> openTransactionsPage(frame));
+        logoutButton.addActionListener(e -> logout(frame));
 
         // Добавляем панель на окно
         frame.add(panel);
@@ -103,5 +110,13 @@ public class AdminMainPage {
     private void openTransactionsPage(JFrame parentFrame) {
         parentFrame.dispose();
         new TransactionsPage().setVisible(true);
+    }
+
+    private void logout(JFrame parentFrame) {
+        int confirm = JOptionPane.showConfirmDialog(parentFrame, "Вы уверены, что хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            parentFrame.dispose();
+            new LoginPage(); // Возвращаем пользователя на страницу входа
+        }
     }
 }
