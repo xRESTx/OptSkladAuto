@@ -54,4 +54,9 @@ public class Station {
     public void setManager(Employee manager) {
         this.manager = manager;
     }
+    @Override
+    public String toString() {
+        return name; // Или любое другое поле, которое хотите отображать
+    }
+
 }

@@ -55,11 +55,14 @@ public class EmployeesPage extends JFrame {
         addButton.addActionListener(e -> openEmployeeForm(null)); // Добавление
         editButton.addActionListener(e -> editSelectedEmployee()); // Редактирование
         deleteButton.addActionListener(e -> deleteSelectedEmployee()); // Удаление
-        backButton.addActionListener(e -> dispose()); // Закрыть окно
+        backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
-
+    private void goBack() {
+        dispose();
+        new AdminMainPage();
+    }
     // Загрузка данных сотрудников в таблицу
     private void loadEmployees() {
         tableModel.setRowCount(0);

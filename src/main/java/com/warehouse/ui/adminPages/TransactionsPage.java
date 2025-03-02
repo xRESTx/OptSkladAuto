@@ -2,6 +2,7 @@ package com.warehouse.ui.adminPages;
 
 import com.warehouse.dao.TransactionDAO;
 import com.warehouse.models.Transaction;
+import com.warehouse.ui.dialog.TransactionForm;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

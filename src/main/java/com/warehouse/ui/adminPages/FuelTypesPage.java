@@ -54,11 +54,14 @@ public class FuelTypesPage extends JFrame {
         addButton.addActionListener(e -> openFuelTypeForm(null)); // Добавить новый тип топлива
         editButton.addActionListener(e -> editSelectedFuelType()); // Редактировать выбранный тип топлива
         deleteButton.addActionListener(e -> deleteSelectedFuelType()); // Удалить выбранный тип топлива
-        backButton.addActionListener(e -> dispose()); // Закрыть окно
+        backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
-
+    private void goBack() {
+        dispose();
+        new AdminMainPage();
+    }
     // Загрузка данных о типах топлива в таблицу
     private void loadFuelTypes() {
         tableModel.setRowCount(0);

@@ -4,14 +4,20 @@ import com.warehouse.dao.EmployeeDAO;
 import com.warehouse.dao.StationDAO;
 import com.warehouse.models.Employee;
 import com.warehouse.models.Station;
+import org.jdatepicker.impl.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Properties;
 
 public class EmployeeForm extends JDialog {
-    private JTextField nameField, positionField, salaryField, hireDateField;
+    private JTextField nameField, positionField, salaryField;
     private JComboBox<Station> stationComboBox;
+    private JDatePickerImpl datePicker; // Календарь
     private EmployeeDAO employeeDAO;
     private StationDAO stationDAO;
     private Employee employee;
@@ -39,9 +45,9 @@ public class EmployeeForm extends JDialog {
         salaryField = new JTextField();
         add(salaryField);
 
-        add(new JLabel("Дата найма (YYYY-MM-DD):"));
-        hireDateField = new JTextField();
-        add(hireDateField);
+        add(new JLabel("Дата найма:"));
+        datePicker = createDatePicker();
+        add(datePicker);
 
         add(new JLabel("Станция:"));
         stationComboBox = new JComboBox<>();
@@ -58,7 +64,12 @@ public class EmployeeForm extends JDialog {
             nameField.setText(employee.getFullName());
             positionField.setText(employee.getPosition());
             salaryField.setText(String.valueOf(employee.getSalary()));
-            hireDateField.setText(employee.getHireDate().toString());
+
+            // Устанавливаем текущую дату найма
+            if (employee.getHireDate() != null) {
+                ((UtilDateModel) datePicker.getModel()).setValue(new java.util.Date(employee.getHireDate().getTime()));
+            }
+
             stationComboBox.setSelectedItem(employee.getStation());
         }
 
@@ -66,6 +77,17 @@ public class EmployeeForm extends JDialog {
         cancelButton.addActionListener(e -> dispose());
 
         setVisible(true);
+    }
+
+    private JDatePickerImpl createDatePicker() {
+        UtilDateModel model = new UtilDateModel();
+        Properties p = new Properties();
+        p.put("text.today", "Сегодня");
+        p.put("text.month", "Месяц");
+        p.put("text.year", "Год");
+
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        return new JDatePickerImpl(datePanel, new DateLabelFormatter());
     }
 
     private void loadStations() {
@@ -79,7 +101,11 @@ public class EmployeeForm extends JDialog {
         String name = nameField.getText();
         String position = positionField.getText();
         double salary = Double.parseDouble(salaryField.getText());
-        String hireDate = hireDateField.getText();
+
+        // Получаем дату из JDatePicker
+        java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
+        Date sqlDate = (selectedDate != null) ? new Date(selectedDate.getTime()) : null;
+
         Station selectedStation = (Station) stationComboBox.getSelectedItem();
 
         if (employee == null) {
@@ -89,7 +115,7 @@ public class EmployeeForm extends JDialog {
         employee.setFullName(name);
         employee.setPosition(position);
         employee.setSalary(salary);
-        employee.setHireDate(java.sql.Date.valueOf(hireDate));
+        employee.setHireDate(sqlDate);
         employee.setStation(selectedStation);
 
         if (employee.getEmployeeId() == 0) {
@@ -99,5 +125,23 @@ public class EmployeeForm extends JDialog {
         }
 
         dispose();
+    }
+
+    // Форматтер даты для JDatePicker
+    private static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            return dateFormat.parse(text);
+        }
+
+        @Override
+        public String valueToString(Object value) {
+            if (value != null) {
+                return dateFormat.format(((java.util.Date) value));
+            }
+            return "";
+        }
     }
 }

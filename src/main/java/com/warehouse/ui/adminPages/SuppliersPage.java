@@ -54,11 +54,14 @@ public class SuppliersPage extends JFrame {
         addButton.addActionListener(e -> openSupplierForm(null)); // Добавить новый поставщик
         editButton.addActionListener(e -> editSelectedSupplier()); // Редактировать выбранного поставщика
         deleteButton.addActionListener(e -> deleteSelectedSupplier()); // Удалить выбранного поставщика
-        backButton.addActionListener(e -> dispose()); // Закрыть окно
+        backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
-
+    private void goBack() {
+        dispose();
+        new AdminMainPage();
+    }
     // Загрузка данных о поставщиках в таблицу
     private void loadSuppliers() {
         tableModel.setRowCount(0);

@@ -54,11 +54,14 @@ public class FuelStockPage extends JFrame {
         addButton.addActionListener(e -> openFuelStockForm(null)); // Добавление
         editButton.addActionListener(e -> editSelectedFuelStock()); // Редактирование
         deleteButton.addActionListener(e -> deleteSelectedFuelStock()); // Удаление
-        backButton.addActionListener(e -> dispose()); // Закрыть окно
+        backButton.addActionListener(e -> goBack()); // Закрыть окно
 
         setVisible(true);
     }
-
+    private void goBack() {
+        dispose();
+        new AdminMainPage();
+    }
     // Загрузка данных о запасах топлива в таблицу
     private void loadFuelStock() {
         tableModel.setRowCount(0);
