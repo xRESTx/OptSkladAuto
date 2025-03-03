@@ -7,13 +7,13 @@ import java.awt.*;
 
 public class AdminDashboard {
     public static void showStartPage() {
-        JFrame frame = new JFrame("Warehouse Management System");
+        JFrame frame = new JFrame("Warehouse Admin System");
         frame.setSize(600, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         // Заголовок
-        JLabel titleLabel = new JLabel("Warehouse Management System", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Warehouse Admin  System", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         frame.add(titleLabel, BorderLayout.NORTH);

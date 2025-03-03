@@ -40,19 +40,48 @@ public class PaymentPage {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
+        JButton editButton = new JButton("Edit Payment");
+        editButton.addActionListener(e -> editPayment(paymentTable, tableModel));
+        buttonPanel.add(editButton); // Добавляем кнопку редактирования
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> frame.dispose());
-        buttonPanel.add(closeButton);
+        buttonPanel.add(closeButton); // Кнопка закрытия
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
 
         loadPaymentData(clientId, tableModel);
 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+    private static void editPayment(JTable table, DefaultTableModel model) {
+        int row = table.getSelectedRow();
+        if (row == -1) return;
 
+        // Выводим диалог с текущими значениями
+        String client = model.getValueAt(row, 1).toString();
+        String invoice = model.getValueAt(row, 2).toString();
+        String date = model.getValueAt(row, 3).toString();
+        String method = model.getValueAt(row, 4).toString();
+        String amount = model.getValueAt(row, 5).toString();
+
+        JTextField dateField = new JTextField(date);
+        JTextField amountField = new JTextField(amount);
+        JComboBox<String> methodComboBox = new JComboBox<>(new String[]{"Card", "Cash", "Online"});
+        methodComboBox.setSelectedItem(method);
+
+        int result = JOptionPane.showConfirmDialog(null, new Object[]{
+                "Date:", dateField, "Method:", methodComboBox, "Amount:", amountField
+        }, "Edit Payment", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            model.setValueAt(dateField.getText(), row, 3);
+            model.setValueAt(methodComboBox.getSelectedItem(), row, 4);
+            model.setValueAt(amountField.getText(), row, 5);
+        }
+    }
     private static void loadPaymentData(int clientId, DefaultTableModel tableModel) {
         try (Session session = factory.openSession()) {
             // Запрос с фильтрацией по clientId

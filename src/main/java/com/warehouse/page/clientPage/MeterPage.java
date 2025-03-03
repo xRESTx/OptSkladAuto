@@ -10,6 +10,7 @@ import org.hibernate.cfg.Configuration;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public class MeterPage {
@@ -37,7 +38,6 @@ public class MeterPage {
         String[] columnNames = {"ID", "Client", "Service", "Installation Date", "Last Reading Date", "Last Reading Value"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable meterTable = new JTable(tableModel);
-        meterTable.setEnabled(false); // Отключаем редактирование таблицы
 
         JScrollPane scrollPane = new JScrollPane(meterTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -48,6 +48,10 @@ public class MeterPage {
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> frame.dispose());
         buttonPanel.add(closeButton);
+
+        JButton editButton = new JButton("Edit Meter");
+        editButton.addActionListener(e -> editMeter(meterTable, tableModel));
+        buttonPanel.add(editButton);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -82,4 +86,157 @@ public class MeterPage {
             JOptionPane.showMessageDialog(null, "Error loading meters: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private static void editMeter(JTable meterTable, DefaultTableModel tableModel) {
+        int selectedRow = meterTable.getSelectedRow();
+        if (selectedRow == -1) return;
+
+        int meterId = (int) tableModel.getValueAt(selectedRow, 0);
+
+        // Создаем диалоговое окно для редактирования счетчика
+        JDialog editMeterDialog = new JDialog();
+        editMeterDialog.setTitle("Edit Meter");
+        editMeterDialog.setSize(400, 400);
+        editMeterDialog.setLayout(new BorderLayout());
+
+        // Создаем панель для полей формы
+        JPanel formPanel = new JPanel(new GridLayout(7, 2));
+        editMeterDialog.add(formPanel, BorderLayout.CENTER);
+
+        // Поля формы
+        JLabel clientLabel = new JLabel("Client: ");
+        JComboBox<String> clientComboBox = new JComboBox<>();
+        try (Session session = factory.openSession()) {
+            Meter meter = session.get(Meter.class, meterId);
+            if (meter != null) {
+                List<Client> clients = session.createQuery("from Client", Client.class).list();
+                for (Client client : clients) {
+                    clientComboBox.addItem(client.getFullName());
+                }
+                clientComboBox.setSelectedItem(meter.getClient().getFullName());
+            }
+        }
+        formPanel.add(clientLabel);
+        formPanel.add(clientComboBox);
+
+        JLabel serviceLabel = new JLabel("Service: ");
+        JComboBox<String> serviceComboBox = new JComboBox<>();
+        try (Session session = factory.openSession()) {
+            Meter meter = session.get(Meter.class, meterId);
+            if (meter != null) {
+                List<Service> services = session.createQuery("from Service", Service.class).list();
+                for (Service service : services) {
+                    serviceComboBox.addItem(service.getName());
+                }
+                serviceComboBox.setSelectedItem(meter.getService().getName());
+            }
+        }
+        formPanel.add(serviceLabel);
+        formPanel.add(serviceComboBox);
+
+        JLabel installationDateLabel = new JLabel("Installation Date: ");
+        JTextField installationDateField = new JTextField();
+        try (Session session = factory.openSession()) {
+            Meter meter = session.get(Meter.class, meterId);
+            if (meter != null) {
+                installationDateField.setText(meter.getInstallationDate().toString());
+            }
+        }
+        formPanel.add(installationDateLabel);
+        formPanel.add(installationDateField);
+
+        JLabel lastReadingDateLabel = new JLabel("Last Reading Date: ");
+        JTextField lastReadingDateField = new JTextField();
+        try (Session session = factory.openSession()) {
+            Meter meter = session.get(Meter.class, meterId);
+            if (meter != null) {
+                lastReadingDateField.setText(meter.getLastReadingDate().toString());
+            }
+        }
+        formPanel.add(lastReadingDateLabel);
+        formPanel.add(lastReadingDateField);
+
+        JLabel lastReadingValueLabel = new JLabel("Last Reading Value: ");
+        JTextField lastReadingValueField = new JTextField();
+        try (Session session = factory.openSession()) {
+            Meter meter = session.get(Meter.class, meterId);
+            if (meter != null) {
+                lastReadingValueField.setText(String.valueOf(meter.getLastReadingValue()));
+            }
+        }
+        formPanel.add(lastReadingValueLabel);
+        formPanel.add(lastReadingValueField);
+
+        // Панель для кнопок
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            String clientName = (String) clientComboBox.getSelectedItem();
+            String serviceName = (String) serviceComboBox.getSelectedItem();
+            LocalDate installationDate = LocalDate.parse(installationDateField.getText());
+            LocalDate lastReadingDate = LocalDate.parse(lastReadingDateField.getText());
+            String lastReadingValueText = lastReadingValueField.getText();
+
+            if (lastReadingValueText.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Last Reading Value is required.", "Warning", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                double lastReadingValue = Double.parseDouble(lastReadingValueText);
+
+                try (Session session = factory.openSession()) {
+                    session.beginTransaction();
+                    Meter meter = session.get(Meter.class, meterId);
+                    if (meter != null) {
+                        Client client = session.createQuery("from Client where fullName = :name", Client.class)
+                                .setParameter("name", clientName)
+                                .uniqueResult();
+                        Service service = session.createQuery("from Service where name = :name", Service.class)
+                                .setParameter("name", serviceName)
+                                .uniqueResult();
+
+                        if (client == null || service == null) {
+                            JOptionPane.showMessageDialog(null, "Invalid client or service selected", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        meter.setClient(client);
+                        meter.setService(service);
+                        meter.setInstallationDate(installationDate);
+                        meter.setLastReadingDate(lastReadingDate);
+                        meter.setLastReadingValue(lastReadingValue); // Обновление lastReadingValue
+                        session.update(meter);
+                        session.getTransaction().commit();
+
+                        // Обновляем таблицу
+                        tableModel.setValueAt(clientName, selectedRow, 1);
+                        tableModel.setValueAt(serviceName, selectedRow, 2);
+                        tableModel.setValueAt(installationDate, selectedRow, 3);
+                        tableModel.setValueAt(lastReadingDate, selectedRow, 4);
+                        tableModel.setValueAt(lastReadingValue, selectedRow, 5); // Обновляем lastReadingValue в таблице
+
+                        editMeterDialog.dispose();  // Закрываем диалог после сохранения
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid value for last reading. Please enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error editing meter: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> editMeterDialog.dispose());  // Закрытие диалога без сохранения
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(closeButton);
+        editMeterDialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        editMeterDialog.setLocationRelativeTo(null);
+        editMeterDialog.setModal(true);
+        editMeterDialog.setVisible(true);
+    }
+
 }
