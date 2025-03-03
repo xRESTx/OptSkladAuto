@@ -11,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class PaymentPage {
@@ -155,32 +156,103 @@ public class PaymentPage {
         dialog.setVisible(true);
     }
 
-    private static void editPayment(JTable table, DefaultTableModel model) {
-        int row = table.getSelectedRow();
-        if (row == -1) return;
+    private static void editPayment(JTable paymentTable, DefaultTableModel tableModel) {
+        int selectedRow = paymentTable.getSelectedRow();
+        if (selectedRow == -1) return;
 
-        // Выводим диалог с текущими значениями
-        String client = model.getValueAt(row, 1).toString();
-        String invoice = model.getValueAt(row, 2).toString();
-        String date = model.getValueAt(row, 3).toString();
-        String method = model.getValueAt(row, 4).toString();
-        String amount = model.getValueAt(row, 5).toString();
+        int paymentId = (int) tableModel.getValueAt(selectedRow, 0);
 
-        JTextField dateField = new JTextField(date);
-        JTextField amountField = new JTextField(amount);
+        // Создание диалогового окна
+        JDialog editPaymentDialog = new JDialog();
+        editPaymentDialog.setTitle("Edit Payment");
+        editPaymentDialog.setSize(400, 250);
+        editPaymentDialog.setLayout(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridLayout(3, 2));
+        editPaymentDialog.add(formPanel, BorderLayout.CENTER);
+
+        JLabel dateLabel = new JLabel("Payment Date (yyyy-MM-dd, optional): ");
+        JTextField dateField = new JTextField();
+
+        JLabel methodLabel = new JLabel("Payment Method: ");
         JComboBox<String> methodComboBox = new JComboBox<>(new String[]{"Card", "Cash", "Online"});
-        methodComboBox.setSelectedItem(method);
 
-        int result = JOptionPane.showConfirmDialog(null, new Object[]{
-                "Date:", dateField, "Method:", methodComboBox, "Amount:", amountField
-        }, "Edit Payment", JOptionPane.OK_CANCEL_OPTION);
+        JLabel amountLabel = new JLabel("Amount: ");
+        JTextField amountField = new JTextField();
 
-        if (result == JOptionPane.OK_OPTION) {
-            model.setValueAt(dateField.getText(), row, 3);
-            model.setValueAt(methodComboBox.getSelectedItem(), row, 4);
-            model.setValueAt(amountField.getText(), row, 5);
+        try (Session session = factory.openSession()) {
+            Payment payment = session.get(Payment.class, paymentId);
+            if (payment != null) {
+                dateField.setText(payment.getPaymentDate() != null ? payment.getPaymentDate().toString() : "");  // Обрабатываем null
+                methodComboBox.setSelectedItem(payment.getPaymentMethod());
+                amountField.setText(String.valueOf(payment.getAmount()));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error loading payment details: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        formPanel.add(dateLabel);
+        formPanel.add(dateField);
+        formPanel.add(methodLabel);
+        formPanel.add(methodComboBox);
+        formPanel.add(amountLabel);
+        formPanel.add(amountField);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> {
+            String dateText = dateField.getText().trim();
+            LocalDate paymentDate = dateText.isEmpty() ? null : LocalDate.parse(dateText);  // Позволяет null
+            String paymentMethod = methodComboBox.getSelectedItem().toString();
+            double paymentAmount;
+
+            try {
+                paymentAmount = Double.parseDouble(amountField.getText());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid amount format", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try (Session session = factory.openSession()) {
+                session.beginTransaction();
+                Payment payment = session.get(Payment.class, paymentId);
+                if (payment != null) {
+                    payment.setPaymentDate(paymentDate);
+                    payment.setPaymentMethod(paymentMethod);
+                    payment.setAmount(paymentAmount);
+
+                    session.update(payment);
+                    session.getTransaction().commit();
+
+                    // Обновляем данные в таблице
+                    tableModel.setValueAt(paymentDate != null ? paymentDate.toString() : "N/A", selectedRow, 3);
+                    tableModel.setValueAt(paymentMethod, selectedRow, 4);
+                    tableModel.setValueAt(paymentAmount, selectedRow, 5);
+
+                    JOptionPane.showMessageDialog(null, "Payment updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    editPaymentDialog.dispose();
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error updating payment: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> editPaymentDialog.dispose());
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(closeButton);
+        editPaymentDialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        editPaymentDialog.setLocationRelativeTo(null);
+        editPaymentDialog.setModal(true);
+        editPaymentDialog.setVisible(true);
     }
+
+
 
     private static void deletePayment(JTable table, DefaultTableModel tableModel) {
         int row = table.getSelectedRow();
