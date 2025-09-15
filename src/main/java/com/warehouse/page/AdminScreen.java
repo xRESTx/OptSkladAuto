@@ -40,6 +40,7 @@ public class AdminScreen {
         addButtonWithLabel(buttonPanel, "Order Items", OrderItemsPage::showOrderItemsPage, getOrderItemsCount());
         addButtonWithLabel(buttonPanel, "Suppliers", SuppliersPage::showSuppliersPage, getSuppliersCount());
         addButtonWithLabel(buttonPanel, "Supplies", SuppliesPage::showSuppliesPage, getSuppliesCount());
+        addButtonWithLabel(buttonPanel, "ApiRequest", ApiRequestPage::showApiRequestPage, getSuppliesCount());
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
 

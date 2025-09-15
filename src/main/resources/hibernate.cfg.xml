@@ -43,5 +43,6 @@
         <mapping class="com.warehouse.entities.Product"/>
         <mapping class="com.warehouse.entities.Request"/>
         <mapping class="com.warehouse.entities.Supplier"/>
+        <mapping class="com.warehouse.entities.Coordinate"/>
     </session-factory>
 </hibernate-configuration>
